@@ -24,8 +24,15 @@ class Stego(ABC):
                 print("Only utf-8 characters allowed\n")
                 continue
 
+            byteArrayString = ''
+
             self.message = userInput
-            byteArrayString = ''.join(format(i, 'b') for i in bytearray(userInput, encoding='utf-8'))
+
+            for i in bytearray(userInput, encoding='utf-8'):
+                byteArrayString += format(i, '#010b')[2:]
+                print("ByteArrayString: " + str(byteArrayString))
+            byteArrayString += "00000000"  # eof
+
             byteArray = []
 
             for bit in byteArrayString:
@@ -35,7 +42,7 @@ class Stego(ABC):
                 print("Payload ({} bites) bigger than container volume ({} bites).\n".format(len(byteArray), self.volume))
                 continue
 
-            self.payload = byteArray.append([1, 1, 1, 1, 1, 1, 1, 1])
+            self.payload = byteArray
 
             print("Payload set: {}\nas: {}\n\n".format(self.message, byteArrayString))
             payloadSuccess = True

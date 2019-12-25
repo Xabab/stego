@@ -43,7 +43,9 @@ class Block(Stego):
 
             self.setPayload()
 
-            if self.payload is None: return
+            if self.payload is None:
+                print("dbg: payload  is None, returning")
+                return
 
             exit = False
 
@@ -85,12 +87,21 @@ class Block(Stego):
 
         i = 0
 
+        print(self.payload)
+
         for x in range(0, self.image.size[0], self.blockSide):
             for y in range(0, self.image.size[1], self.blockSide):
                 if i < len(self.payload):
                     px = tempimg.getpixel((x, y))
-                    px = (px[0], px[1], px[2] ^ self.payload[i])
+                    tempDbg = px[2]
+
+                    if self.payload[i] != px[2] % 2:
+                        px = (px[0], px[1], px[2] ^ 1)
+
                     tempimg.putpixel((x, y), px)
+                    print(("p: " + str(self.payload[i]), "px (x,y)" + str((x, y)), "px: " + str(tempDbg),
+                           "p_px: " + str(px[2]), "r_p: " + str(tempimg.getpixel((x, y))[2] % 2)))
+                    i = i + 1
 
         return tempimg
 
@@ -102,11 +113,13 @@ class Block(Stego):
 
         for x in range(0, img.size[0], blockSide):
             for y in range(0, img.size[1], blockSide):
-                if len(byte) == 7:
-                    if byte == [1, 1, 1, 1, 1, 1, 1, 1]:
+                if len(byte) == 8:
+                    if byte == [0, 0, 0, 0, 0, 0, 0, 0]:
                         return string
-                    char = chr(int(''.join(str(b) for b in byte), 2))
-                    print(char)
+                    char = chr(int(''.join(str(b) for b in byte[1:]), 2)) # for heck's sake
+                    print((byte, int(''.join(str(b) for b in byte[1:]), 2), char))
+
                     string = string + char
                     byte = []
+                print(("x, y: " + str((x, y))), "p: " + str(img.getpixel((x, y))[2] % 2))
                 byte.append(img.getpixel((x, y))[2] % 2)
