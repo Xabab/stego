@@ -7,8 +7,9 @@ from imageio import imread
 from block import Block
 
 if __name__ == "__main__":
-    print(Block.getStegoMessage(Image.open("./stego.bmp"), 2))
+    # print(Block.getStegoMessage(Image.open("./stego.bmp"), 2))
 
+    Im
 
 
 
