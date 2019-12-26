@@ -1,7 +1,7 @@
 import numpy as np
 from PIL import Image
 
-from stego import Stego
+from old.stego import Stego
 from typing import List
 byteList = List[int]
 

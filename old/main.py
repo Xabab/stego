@@ -1,10 +1,10 @@
 import numpy as np
 from PIL import Image
 
-from block import Block
-from Cross import Cross
-from crossTough import CrossTough
-from quant import Quant
+from old.block import Block
+from old.Cross import Cross
+from old.crossTough import CrossTough
+from old.quant import Quant
 
 
 from typing import List

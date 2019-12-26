@@ -1,11 +1,9 @@
 import random
 import time
 
-import numpy as np
 from PIL import Image
 
-from stego import Stego
-from typing import List
+from old.stego import Stego
 
 
 class Quant(Stego):
@@ -76,7 +74,7 @@ class Quant(Stego):
         while not done:  # menu sequence
             self.inputData()
 
-            self.volume = (self.image.size[0] * self.image.size[1] - 1) // 2
+            self.volume = (self.image.size[0] * self.image.size[1] - 1)
 
             self.setPayload()
 
@@ -105,21 +103,19 @@ class Quant(Stego):
         tempimg = self.image.copy()
 
         i = 0
-        iPx = 0
 
         for x in range(0, self.image.size[0]):
             for y in range(0, self.image.size[1]):
-                if i < len(self.payload) and iPx % 2 == 0:
+                if i < len(self.payload):
                     if y + 1 >= self.image.size[1]:
                         xy1 = (x + 1, 0)
                     else: xy1 = (x, y + 1)
 
                     px0 = tempimg.getpixel((x, y))
-                    px1 = tempimg.getpixel( xy1)
+                    px1 = tempimg.getpixel(xy1)
 
 
-                    diff = px0[2] - px1[2]
-                    pxB  = px0[2]
+                    diff = px1[2] - px0[2]
 
                     index = self.key[0].index(diff)
                     indexDeviation = 0
@@ -127,26 +123,25 @@ class Quant(Stego):
                     pxB = px0[2]
 
                     while True:
-                        if index - indexDeviation >= 0               and self.payload[i] == self.key[1][index - indexDeviation]:
-                            pxB += self.key[0][index - indexDeviation]
-                            break
+                        if index - indexDeviation >= 0 and index + indexDeviation < len(self.key[0]):
+                            if self.payload[i] == self.key[1][index - indexDeviation]:
+                                pxB += self.key[0][index - indexDeviation]
+                                print((self.key[1][pxB - px0[2]], -indexDeviation))
+                                break
 
-                        if index + indexDeviation < len(self.key[0]) and self.payload[i] == self.key[1][index + indexDeviation]:
-                            pxB += self.key[0][index + indexDeviation]
-                            break
-
-                        if indexDeviation > 512: raise Exception()
+                            if self.payload[i] == self.key[1][index + indexDeviation]:
+                                pxB += self.key[0][index + indexDeviation]
+                                print((self.key[1][pxB - px0[2]], indexDeviation))
+                                break
 
                         indexDeviation += 1
+                        if indexDeviation > len(self.key): raise Exception()
 
-                    px = (px0[0], px0[1], pxB)
+                    px = (px1[0], px1[1], pxB)
 
-                    print((px0[2], (x, y), px1[2], xy1, diff))
-
-                    tempimg.putpixel((x, y), px)
+                    tempimg.putpixel(xy1, px)
 
                     i += 1
-                iPx += 1
 
         return tempimg
 
