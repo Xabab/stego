@@ -2,7 +2,7 @@ import numpy as np
 from PIL import Image
 
 from block import Block
-from cross import Cross
+from Cross import Cross
 from crossTough import CrossTough
 from quant import Quant
 

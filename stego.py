@@ -46,7 +46,7 @@ class Stego(ABC):
             print()
 
             if userInput == "0":
-                return
+                return None
 
             if not all(ord(c) < 256 for c in userInput):
                 print("Only utf-8 characters allowed\n")

@@ -18,8 +18,8 @@ class Block(Stego):
             print("Not an integer. Try again.\n")
             return False
 
-        if not isinstance(userInput, int) or not np.math.log(userInput, 2).is_integer():
-            print("Sorry, given input must be a power of two. Try again.\n")
+        if not isinstance(userInput, int) or not np.math.log(userInput, 2).is_integer() or userInput < 1:
+            print("Sorry, given input must be a power of two and bigger than zero. Try again.\n")
             return False
 
         if userInput > maxSize:
@@ -28,23 +28,25 @@ class Block(Stego):
 
         return True
 
+    def inputData(self):
+        blockSizeSetSuccess = False
+
+        while not blockSizeSetSuccess:
+            userInput = input("Set block size (a power of two): ")
+            print()
+
+            if userInput == 0:
+                return
+
+            blockSizeSetSuccess = self._blockSizeInputCheck(userInput, self.image.size[0])
+            if not blockSizeSetSuccess: continue
+
+            self.blockSide = int(userInput)
 
     def menu(self):
         done = False
         while not done:  # menu sequence
-            blockSizeSetSuccess = False
-
-            while not blockSizeSetSuccess:
-                userInput = input("Set block size (a power of two): ")
-                print()
-
-                if userInput == 0:
-                    return
-
-                blockSizeSetSuccess = self._blockSizeInputCheck(userInput, self.image.size[0])
-                if not blockSizeSetSuccess: continue
-
-                self.blockSide = int(userInput)
+            self.inputData()
 
             self.volume = self.image.size[0]*self.image.size[1] // (self.blockSide * self.blockSide)
 
@@ -61,11 +63,12 @@ class Block(Stego):
 
     def printInfo(self):
         print("Container image: {}".format(str(self.image)))
-        print("Container volume (blocks/bites): {}".format(self.volume))
+        print("Container volume (blocks or bites): {}".format(self.volume))
+        print("Payload volume: {}".format(len(self.payload)))
         print("Payload: {}".format(self.message))
-        print("Payload (chars count): {}".format(len(self.message)))
         print("Payload (binary): {}".format(''.join(str(self.payload))))
-        print("Payload volume (bites): {}".format(len(self.payload)))
+        print("Payload volume (bits): {}".format(len(self.payload)))
+        print()
 
 
     def returnStegoImage(self):
