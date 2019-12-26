@@ -35,7 +35,8 @@ class Stego(ABC):
             if userInput == 1:
                 self.printInfo()
             else:
-                self.returnStegoImage().save(input("Save as:") + ".bmp")
+                self.returnStegoImage().save(input("Save as ({input}.bmp): ") + ".bmp")
+                print()
 
 
     def setPayload(self) -> None:
@@ -99,7 +100,7 @@ class Stego(ABC):
         for i in range(0, len(byteList), 8):
             char = chr(int(''.join(str(b) for b in byteList[i : i + 8]), 2))  # for heck's sake
 
-            if char == '\00': break
+            if char == '\00': break  # double check
 
             string += char
 

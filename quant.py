@@ -1,69 +1,86 @@
-from stego import Stego
-
+import random
+import time
 
 import numpy as np
 from PIL import Image
 
 from stego import Stego
 from typing import List
-byteList = List[int]
-key = List[int]
+
 
 class Quant(Stego):
     def __init__(self, image: Image):
         super().__init__(image)
+        self.seed = None
         self.key = None
 
-    def _generateKey(self, seed: int) -> key:
-        raise NotImplementedError("Quant._generateKey()")
+    @staticmethod
+    def _generateKey(seed: int):
+        random.seed(seed)
 
-    def generateKey(self):
-        raise NotImplementedError("Quant.generateKey()")
+        key = [[], []]
 
-#################################################################################
+        for i in range (-255, 256):
+            key[0].append(i)
+            key[1].append(random.randint(0, 1))
+
+        print(key)
+        return key
+
 
     @staticmethod
-    def _blockSizeInputCheck(input: str, maxSize: int) -> bool:
+    def _keyInputCheck(userInput) -> bool:
         try:
-            userInput = int(input)
+            userInput = int(userInput)
         except ValueError:
             print("Not an integer. Try again.\n")
             return False
 
-        if not isinstance(userInput, int) or not np.math.log(userInput, 2).is_integer():
-            print("Sorry, given input must be a power of two. Try again.\n")
-            return False
+        if userInput == -1:
+            return True
 
-        if userInput > maxSize:
-            print("Sorry, given block size is bigger than an image. Try again.\n")
+        if not isinstance(userInput, int) or userInput < 1 or userInput > 65536:
+            print("Sorry, given input must be 1 <= N <= 65536.\n")
             return False
 
         return True
 
 
-    def menu(self):
+    def inputData(self) -> None:
+        seedSetSuccess = False
+        while not seedSetSuccess:
+            userInput = input("Set key (-1 to set randomly): ")
+            print()
+
+            if userInput == "0":
+                return
+
+            seedSetSuccess = self._keyInputCheck(userInput)
+            if not seedSetSuccess: continue
+
+            if int(userInput) == -1:
+                random.seed(time.time())
+                self.seed = random.randint(1, 65536)
+                print("Random seed set: {}".format(self.seed))
+                break
+
+            self.seed = int(userInput)
+            self.key = self._generateKey(self.seed)
+
+
+
+
+
+    def menu(self) -> None:
         done = False
         while not done:  # menu sequence
-            blockSizeSetSuccess = False
+            self.inputData()
 
-            while not blockSizeSetSuccess:
-                userInput = input("Set block size (a power of two): ")
-                print()
-
-                if userInput == 0:
-                    return
-
-                blockSizeSetSuccess = self._blockSizeInputCheck(userInput, self.image.size[0])
-                if not blockSizeSetSuccess: continue
-
-                self.blockSide = int(userInput)
-
-            self.volume = self.image.size[0]*self.image.size[1] // (self.blockSide * self.blockSide)
+            self.volume = (self.image.size[0] * self.image.size[1] - 1) // 2
 
             self.setPayload()
 
             if self.payload is None:
-                print("dbg: payload  is None, returning")
                 return
 
             done = True
@@ -73,12 +90,14 @@ class Quant(Stego):
 
     def printInfo(self):
         print("Container image: {}".format(str(self.image)))
-        print("Container volume (blocks/bites): {}".format(self.volume))
+        print("Key: {}".format(str(self.key)))
+        print("Container volume (bits): {}".format(self.volume))
         print("Payload: {}".format(self.message))
         print("Payload (chars count): {}".format(len(self.message)))
         print("Payload (binary): {}".format(''.join(str(self.payload))))
-        print("Payload volume (bites): {}".format(len(self.payload)))
-
+        print("Payload volume (bits): {}".format(len(self.payload)))
+        print("KEY: [(]seed: {}]".format(self.seed))
+        print()
 
     def returnStegoImage(self):
         if self.payload is None: return None
@@ -86,59 +105,108 @@ class Quant(Stego):
         tempimg = self.image.copy()
 
         i = 0
+        iPx = 0
 
-        # print(self.payload)
+        for x in range(0, self.image.size[0]):
+            for y in range(0, self.image.size[1]):
+                if i < len(self.payload) and iPx % 2 == 0:
+                    if y + 1 >= self.image.size[1]:
+                        xy1 = (x + 1, 0)
+                    else: xy1 = (x, y + 1)
 
-        for x in range(0, self.image.size[0], self.blockSide):
-            for y in range(0, self.image.size[1], self.blockSide):
-                if i < len(self.payload):
-                    px = tempimg.getpixel((x, y))
-                    # tempDbg = px[2]
+                    px0 = tempimg.getpixel((x, y))
+                    px1 = tempimg.getpixel( xy1)
 
-                    if self.payload[i] != px[2] % 2:  px = (px[0], px[1], px[2] ^ 1)
+
+                    diff = px0[2] - px1[2]
+                    pxB  = px0[2]
+
+                    index = self.key[0].index(diff)
+                    indexDeviation = 0
+
+                    pxB = px0[2]
+
+                    while True:
+                        if index - indexDeviation >= 0               and self.payload[i] == self.key[1][index - indexDeviation]:
+                            pxB += self.key[0][index - indexDeviation]
+                            break
+
+                        if index + indexDeviation < len(self.key[0]) and self.payload[i] == self.key[1][index + indexDeviation]:
+                            pxB += self.key[0][index + indexDeviation]
+                            break
+
+                        if indexDeviation > 512: raise Exception()
+
+                        indexDeviation += 1
+
+                    px = (px0[0], px0[1], pxB)
+
+                    print((px0[2], (x, y), px1[2], xy1, diff))
 
                     tempimg.putpixel((x, y), px)
 
-                    # print(("p: " + str(self.payload[i]), "px (x,y)" + str((x, y)), "px: " + str(tempDbg),
-                    #        "p_px: " + str(px[2]), "r_p: " + str(tempimg.getpixel((x, y))[2] % 2)))
-
-                    i = i + 1
+                    i += 1
+                iPx += 1
 
         return tempimg
-
 
     @staticmethod
     def getStegoMessage(img: Image) -> str:
 
-        blockSizeSetSuccess = False
+        key = None
 
-        while not blockSizeSetSuccess:
-            userInput = input("Set block size (a power of two) or '0' to exit: ")
+        keySetSuccess = False
+        while not keySetSuccess:
+            userInput = input("Enter seed: ")
             print()
 
+            if userInput == -1:
+                print("Input must be bigger than zero. Try again.\n")
+                continue
+
             if userInput == 0:
-                return ''
+                return ""
 
-            blockSizeSetSuccess = Quant._blockSizeInputCheck(userInput, img.size[0])
-            if not blockSizeSetSuccess: continue
+            keySetSuccess = Quant._keyInputCheck(userInput)
+            if not keySetSuccess: continue
 
-            blockSide = int(userInput)
+            key = int(userInput)
 
-        return Stego._decodePayload(Quant._retrievePayloadFromImage(img, blockSide))
 
+        dbg = Quant._decodePayload(Quant._retrievePayloadFromImage(img, key))
+        return dbg
 
     @staticmethod
-    def _retrievePayloadFromImage(img: Image, blockSide: int):
+    def _retrievePayloadFromImage(img: Image, seed: int):
         byteList = []
 
-        for x in range(0, img.size[0], blockSide):
-            for y in range(0, img.size[1], blockSide):
-                byteList.append(img.getpixel((x, y))[2] % 2)
 
-                if byteList[-8:] == [0, 0, 0, 0, 0, 0, 0, 0]:
-                    return byteList[:-8]
+        key = Quant._generateKey(seed)
 
-        return None  # if not found EOF
+        iPx = 0
+
+        for x in range(0, img.size[0]):
+            for y in range(0, img.size[1]):
+                if iPx % 2 == 0:
+                    px0 = img.getpixel((x, y))
+                    if y + 1 >= img.size[1]:
+                        xy1 = (x + 1, 0)
+                    else:
+                        xy1 = (x, y + 1)
+
+                    px1 = img.getpixel(xy1)
+
+                    byteList.append(key[1][px0[2] - px1[2]])
+
+                    if byteList[-8:] == [0, 0, 0, 0, 0, 0, 0, 0] and len(byteList) % 8 == 0:
+                        print(byteList)
+                        return byteList[:-8]
+
+
+        print("Empty")
+        return None
+
+
 
     @staticmethod
     def printStegoMessage(img: Image) -> None:
