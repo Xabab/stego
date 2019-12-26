@@ -12,11 +12,11 @@ class Stego(ABC):
         self.message = None
 
     def importImage(self, path:str):
-        self.image = Image.open()
+        self.image = Image.open(path)
 
     def setMessage(self, message: str) -> None:
         self.message = message
-        self.payload = self._decodePayload(message)
+        self.payload = self._encodePayload(message)
 
     @staticmethod
     def _encodePayload(string: str) -> List[int]:

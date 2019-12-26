@@ -7,7 +7,7 @@ from PIL import Image
 from logic.Stego import Stego
 
 
-class Block(Stego):
+class Cross(Stego):
     def __init__(self):
         super().__init__()
         self.seed = None

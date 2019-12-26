@@ -31,6 +31,8 @@ class Block(Stego):
         if self.payload   is None: raise TypeError
         if self.image     is None: raise TypeError
         if self.blockSide is None: raise TypeError
+        if self.image.size[0] * self.image.size[1] // self.blockSide ** 2 < len(self.payload):
+                                   raise ValueError
 
         i = 0
         for y in range(0, self.image.size[1], self.blockSide):
