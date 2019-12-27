@@ -24,7 +24,7 @@ class Stego(ABC):
             userInput = input("Enter a number: ")
             print()
 
-            from old.main import menuChoiceCheck
+            from legacy.main import menuChoiceCheck
 
             if not menuChoiceCheck(userInput, [0, 1, 2]):
                 continue

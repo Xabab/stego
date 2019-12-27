@@ -11,16 +11,15 @@ from logic.Stego import Stego
 class Cross(Stego):
     def __init__(self):
         super().__init__()
-        self.seed = None
-        self.interval = None
-        self.energy = None
+        self.seed        = None
+        self.interval    = None
+        self.energy      = None
         self.repeatCount = None
-        self.cross = None
-        self._eof = '\00\00\00\00\00'
+        self.cross       = None
 
     def getContainerVolume(self) -> int:
-        if self.interval is None: raise TypeError
-        if self.image is None: raise TypeError
+        if self.interval    is None: raise TypeError
+        if self.image       is None: raise TypeError
         if self.repeatCount is None: raise TypeError
 
         return self.image.size[0] * self.image.size[1] // self.interval
@@ -41,15 +40,15 @@ class Cross(Stego):
         return super().decodePayload(byteListClean, eof)
 
     def generateStegoImage(self) -> Image:
-        if self.payload is None: raise TypeError
-        if self.image is None: raise TypeError
-        if self.seed is None: raise TypeError
-        if self.interval is None: raise TypeError
-        if self.energy is None: raise TypeError
+        if self.payload     is None: raise TypeError
+        if self.image       is None: raise TypeError
+        if self.seed        is None: raise TypeError
+        if self.interval    is None: raise TypeError
+        if self.energy      is None: raise TypeError
         if self.repeatCount is None: raise TypeError
         if self.getContainerVolume() < len(self.payload):
-            raise ValueError("Payload ({} bits) bigger than container volume ({} bits)".format(len(self.payload),
-                                                                                               self.getContainerVolume()))
+            raise Warning("Payload ({} bits) bigger than guaranteed container volume ({} bits). Message might be fragmented"
+                          .format(len(self.payload), self.getContainerVolume()))
 
         image = self.image.copy()
         i = 0
@@ -82,7 +81,6 @@ class Cross(Stego):
 
         iPx = 0
         random.seed(self.seed)
-        eof = self.encodePayload(self._eof)
         while iPx < self.image.size[0] * self.image.size[1]:
             y = iPx // self.image.size[0]
             x = iPx % self.image.size[1]

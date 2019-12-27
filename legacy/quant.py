@@ -3,7 +3,7 @@ import time
 
 from PIL import Image
 
-from old.stego import Stego
+from legacy.stego import Stego
 
 
 class Quant(Stego):
@@ -18,7 +18,7 @@ class Quant(Stego):
 
         key = [[], []]
 
-        for i in range (-255, 256):
+        for i in range(-255, 256):
             key[0].append(i)
             key[1].append(random.randint(0, 1))
 
@@ -88,13 +88,13 @@ class Quant(Stego):
 
     def printInfo(self):
         print("Container image: {}".format(str(self.image)))
-        print("Key: {}".format(str(self.key)))
+        print("KEY: {}".format(self.seed))
+        print("Key table: {}".format(str(self.key)))
         print("Container volume (bits): {}".format(self.volume))
         print("Payload: {}".format(self.message))
         print("Payload (chars count): {}".format(len(self.message)))
         print("Payload (binary): {}".format(''.join(str(self.payload))))
         print("Payload volume (bits): {}".format(len(self.payload)))
-        print("KEY: [(]seed: {}]".format(self.seed))
         print()
 
     def returnStegoImage(self):

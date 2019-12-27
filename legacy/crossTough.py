@@ -1,4 +1,4 @@
-from old.stego import Stego
+from legacy.stego import Stego
 
 
 class CrossTough(Stego):

@@ -5,7 +5,7 @@ from statistics import mean
 import numpy as np
 from PIL import Image
 
-from old.stego import Stego
+from legacy.stego import Stego
 from typing import List, Tuple
 
 byteList = List[int]
