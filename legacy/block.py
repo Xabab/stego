@@ -115,7 +115,7 @@ class Block(Stego):
 
             blockSide = int(userInput)
 
-        return Stego._decodePayload(Block._retrievePayloadFromImage(img, blockSide))
+        return Stego.decodePayload(Block._retrievePayloadFromImage(img, blockSide))
 
 
     @staticmethod
@@ -127,7 +127,7 @@ class Block(Stego):
                 byteList.append(img.getpixel((x, y))[2] % 2)
 
                 if byteList[-8:] == [0, 0, 0, 0, 0, 0, 0, 0]:
-                    return byteList[:-8]
+                    return byteList
 
         return None  # if not found EOF
 

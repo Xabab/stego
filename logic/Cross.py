@@ -1,6 +1,7 @@
 import random
+from itertools import repeat
 from statistics import mean
-from typing import List, Tuple
+from typing import Tuple, List
 
 from PIL import Image
 
@@ -14,90 +15,103 @@ class Cross(Stego):
         self.interval = None
         self.energy = None
         self.repeatCount = None
+        self.cross = None
+        self._eof = '\00\00\00\00\00'
 
-    def extractStegoMessage(self, cross: int) -> str:
+    def getContainerVolume(self) -> int:
+        if self.interval is None: raise TypeError
+        if self.image is None: raise TypeError
+        if self.repeatCount is None: raise TypeError
+
+        return self.image.size[0] * self.image.size[1] // self.interval
+
+
+    def encodePayload(self, string: str, eof: str = "") -> List[int]:
+        byteArray = super().encodePayload(string, eof)
+        byteArray = [x for item in byteArray for x in repeat(item, self.repeatCount)]
+
+        return byteArray
+
+    def decodePayload(self, byteList: List[int], eof: str = "") -> str:
+        byteListClean = []
+
+        for i in range(0, len(byteList), self.repeatCount):
+            byteListClean.append(int(round(mean(byteList[i:i+self.repeatCount]))))
+
+        return super().decodePayload(byteListClean, eof)
+
+    def generateStegoImage(self) -> Image:
+        if self.payload is None: raise TypeError
+        if self.image is None: raise TypeError
+        if self.seed is None: raise TypeError
+        if self.interval is None: raise TypeError
+        if self.energy is None: raise TypeError
+        if self.repeatCount is None: raise TypeError
+        if self.getContainerVolume() < len(self.payload):
+            raise ValueError("Payload ({} bits) bigger than container volume ({} bits)".format(len(self.payload),
+                                                                                               self.getContainerVolume()))
+
+        image = self.image.copy()
+        i = 0
+        iPx = 0
+        random.seed(self.seed)
+        size = self.image.size
+        while i < len(self.payload) and iPx < size[0] * size[1]:
+            px = self.image.getpixel((iPx % size[1], (iPx // size[0])))
+            if self.payload[i] == 0:
+                pxB = max(0, int(px[2] - self.energy * self._getLuminosity(px)))
+            else:
+                pxB = min(255, int(px[2] + self.energy * self._getLuminosity(px)))
+
+            tmp = (px[0], px[1], pxB)
+            image.putpixel((iPx % image.size[1], iPx // image.size[0]), tmp)
+
+            i += 1
+            interval = random.randint(1, self.interval)
+            iPx += interval
+
+        return image
+
+    def extractStegoMessage(self) -> str:
         if self.image    is None: raise TypeError
         if self.seed     is None: raise TypeError
         if self.interval is None: raise TypeError
+        if self.cross    is None: raise TypeError
 
         byteList = []
-        repeat = []
 
         iPx = 0
-
         random.seed(self.seed)
-
+        eof = self.encodePayload(self._eof)
         while iPx < self.image.size[0] * self.image.size[1]:
             y = iPx // self.image.size[0]
             x = iPx % self.image.size[1]
 
-            crossMean = 0
+            crossMean = []
 
-            for i in range(1, cross + 1):
+            for i in range(1, self.cross + 1):
                 tempXY = [
-                          (max(x - i, 0),                  y),
-                          (min(x + i, self.image.size[1]), y),
-                          (x,                              max(y - i, 0)),
-                          (x,                              min(y + i, self.image.size[0]))
+                          (max(x - i, 0),                      y),
+                          (min(x + i, self.image.size[1] - 1), y),
+                          (x,                      max(y - i, 0)),
+                          (x, min(y + i, self.image.size[0] - 1))
                          ]
 
-                crossMean += mean(self.image[i][2] for i in tempXY)
+                crossMean.extend([self.image.getpixel(i)[2] for i in tempXY])
 
-            crossMean /= cross * 4
+            crossMean = mean(crossMean)
 
             if self.image.getpixel((x, y))[2] > crossMean:
-                repeat.append(1)
+                byteList.append(1)
             else:
-                repeat.append(0)
-
-            if len(repeat) == self.repeatCount:
-                byteList.append(int(round(mean(repeat))))
-
-                if byteList[-8:] == [0, 0, 0, 0, 0, 0, 0, 0] and len(byteList) % 8 == 0:
-                    payloadBinaryString = ''.join(str(bit) for bit in byteList)
-                    print(' '.join(payloadBinaryString[i:i + 8] for i in range(0, len(payloadBinaryString), 8)))
-
-                    return self._decodePayload(byteList[:-8])
-
-                repeat = []
+                byteList.append(0)
 
             interval = random.randint(1, self.interval)
             iPx += interval
-            random.seed(interval)
 
-        return self._decodePayload(byteList)  # if not found EOF
+        return self.decodePayload(byteList, self._eof)
 
-    def generateStegoImage(self) -> Image:
-        if self.payload     is None: raise TypeError
-        if self.image       is None: raise TypeError
-        if self.seed        is None: raise TypeError
-        if self.interval    is None: raise TypeError
-        if self.energy      is None: raise TypeError
-        if self.repeatCount is None: raise TypeError
-
-        i = 0
-        iPx = 0
-
-        random.seed(self.seed)
-
-        while i < len(self.payload) and iPx < self.image.size[0] * self.image.size[1]:
-            px = self.image.getpixel((iPx % self.image.size[1], (iPx // self.image.size[0])))
-            if self.payload[i] == 0:
-                tmp = int(px[2] - self.energy * self.getLuminosity(px))
-            else:
-                tmp = int(px[2] + self.energy * self.getLuminosity(px))
-
-            tmp = (px[0], px[1], tmp)
-            self.image.putpixel((iPx // self.image.size[0], iPx % self.image.size[1]), tmp)
-
-            i += 1
-
-            interval = random.randint(1, self.interval)
-            iPx += interval
-            random.seed(interval)
-
-        return self.image
 
     @staticmethod
-    def getLuminosity(px: Tuple[int, int, int]):
+    def _getLuminosity(px: Tuple[int, int, int]):
         return px[0] * .2989 + px[1] * .58662 + px[2] * .11448
