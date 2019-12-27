@@ -9,7 +9,6 @@ class Stego(ABC):
     def __init__(self, image: Image):
         self.image = image
         self.payload = None
-        self.volume = None
         self.message = None
 
 
