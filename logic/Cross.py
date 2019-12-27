@@ -92,8 +92,7 @@ class Cross(Stego):
                           (max(x - i, 0),                      y),
                           (min(x + i, self.image.size[1] - 1), y),
                           (x,                      max(y - i, 0)),
-                          (x, min(y + i, self.image.size[0] - 1))
-                         ]
+                          (x, min(y + i, self.image.size[0] - 1))]
 
                 crossMean.extend([self.image.getpixel(i)[2] for i in tempXY])
 
