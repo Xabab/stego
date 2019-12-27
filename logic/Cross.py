@@ -47,7 +47,7 @@ class Cross(Stego):
         if self.energy      is None: raise TypeError
         if self.repeatCount is None: raise TypeError
         if self.getContainerVolume() < len(self.payload):
-            raise Warning("Payload ({} bits) bigger than guaranteed container volume ({} bits). Message might be fragmented"
+            raise ValueError("Payload ({} bits) bigger than guaranteed container volume ({} bits). Message might be fragmented"
                           .format(len(self.payload), self.getContainerVolume()))
 
         image = self.image.copy()

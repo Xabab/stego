@@ -3,7 +3,7 @@ from PIL import Image
 
 from legacy.block import Block
 from legacy.Cross import Cross
-from legacy.crossTough import CrossTough
+from legacy.СrossTough import CrossTough
 from legacy.quant import Quant
 
 
