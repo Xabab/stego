@@ -1,4 +1,5 @@
 import random
+from _warnings import warn
 from itertools import repeat
 from statistics import mean
 from typing import Tuple, List
@@ -47,8 +48,8 @@ class Cross(Stego):
         if self.energy      is None: raise TypeError
         if self.repeatCount is None: raise TypeError
         if self.getContainerVolume() < len(self.payload):
-            raise ValueError("Payload ({} bits) bigger than guaranteed container volume ({} bits). Message might be fragmented"
-                          .format(len(self.payload), self.getContainerVolume()))
+            warningMessage = "Payload ({} bits) bigger than guaranteed container volume ({} bits). Message might be fragmented".format(len(self.payload), self.getContainerVolume())
+            warn(warningMessage)
 
         image = self.image.copy()
         i = 0
