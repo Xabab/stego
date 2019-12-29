@@ -1,3 +1,18 @@
+#  Copyright (c) 2019 Xabab
+#
+#      This program is free software: you can redistribute it and/or modify
+#      it under the terms of the GNU General Public License as published by
+#      the Free Software Foundation, either version 3 of the License, or
+#      (at your option) any later version.
+#
+#      This program is distributed in the hope that it will be useful,
+#      but WITHOUT ANY WARRANTY; without even the implied warranty of
+#      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#      GNU General Public License for more details.
+#
+#      You should have received a copy of the GNU General Public License
+#      along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import random
 from _warnings import warn
 from itertools import repeat
@@ -48,8 +63,8 @@ class Cross(Stego):
         if self.energy      is None: raise TypeError
         if self.repeatCount is None: raise TypeError
         if self.getContainerVolume() < len(self.payload):
-            warningMessage = "Payload ({} bits) bigger than guaranteed container volume ({} bits). Message might be fragmented".format(len(self.payload), self.getContainerVolume())
-            warn(warningMessage)
+            warningMessage = "Payload ({} bits) bigger than guaranteed container volume ({} bits). Message might be fragmented.".format(len(self.payload), self.getContainerVolume())
+            warn(warningMessage, stacklevel=2)  # stacklevel=2 because it's not generateStegoImage's fault that payload is bigger than volume
 
         image = self.image.copy()
         i = 0

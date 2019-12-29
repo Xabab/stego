@@ -1,30 +1,21 @@
+#  Copyright (c) 2019 Xabab
+#
+#      This program is free software: you can redistribute it and/or modify
+#      it under the terms of the GNU General Public License as published by
+#      the Free Software Foundation, either version 3 of the License, or
+#      (at your option) any later version.
+#
+#      This program is distributed in the hope that it will be useful,
+#      but WITHOUT ANY WARRANTY; without even the implied warranty of
+#      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#      GNU General Public License for more details.
+#
+#      You should have received a copy of the GNU General Public License
+#      along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 from PIL import Image, ImageChops
 
-def exadurate(image: Image, diff: Image) -> Image:
-    if image.size != diff.size: raise ValueError("Images dimentions are not equal")
 
-    for y in range(0, image.size[0]):
-        for x in range(0, image.size[1]):
-            if diff.getpixel((x, y)) != (0, 0, 0):
-                image.putpixel((x, y), (0, 0, 0))
-
-    return image
-
-def saveDiff(image1path: str, image2path: str, diffName: str = "diff.bmp") -> None:
-    im1 = Image.open(image1path)
-    im2 = Image.open(image2path)
-
-    difference = ImageChops.difference(im1, im2)
-    difference = exadurate(im2, difference)
-
-    difference.save(diffName)
-
-
-if __name__ == "__main__":
-
-    saveDiff("./l.bmp", "./block.bmp", "diff block.png")
-    saveDiff("./l.bmp", "./cross.bmp", "diff cross.png")
-    saveDiff("./l.bmp", "./quant.bmp", "diff quant.png")
 
 
 
