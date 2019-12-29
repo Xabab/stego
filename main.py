@@ -104,13 +104,12 @@ Phasellus finibus risus quis nibh ultricies imperdiet. Proin tempor ex at sagitt
 def showCopyrightClaim():
     copyrightMessage = """Copyright (C) 2019 Xabab
 This program comes with ABSOLUTELY NO WARRANTY.
-This is free software, and you are welcome to redistribute it
-under certain conditions.\n\n\n"""
+This is free software, and you are welcome to redistribute it under certain conditions.\n\n\n"""
     print(copyrightMessage)
 
 
 if __name__ == "__main__":
-    showCopyrightClaim()
+    showCopyrightClaim()  # "2019", lol, it's like 29th of December
 
     imageGenerateDemo()
 
@@ -134,7 +133,7 @@ if __name__ == "__main__":
 
     print()
     for i in paths:
-        print("{}.bmp {}".format(i, "chanel 'B'"))
+        print("{}.bmp {}".format(i, "chanтel 'B'"))
         print(np.array(Image.open("{}.bmp".format(i)).convert(mode="RGB").getchannel("B")))  # converting because original image is monochromatic (have single channel)
         print()
 
