@@ -15,6 +15,7 @@
 
 import random
 from itertools import repeat
+from math import log
 
 import numpy as np
 import pprint
@@ -23,6 +24,8 @@ from PIL import Image, ImageChops
 from logic.Quant import Quant
 from logic.Block import Block
 from logic.Cross import Cross
+from logic.Spectral import Spectral
+
 
 def exadurate(image: Image, diff: Image) -> Image:
     if image.size != diff.size: raise ValueError("Images dimensions are not equal")
@@ -109,6 +112,7 @@ This is free software, and you are welcome to redistribute it under certain cond
 
 
 if __name__ == "__main__":
+    '''
     showCopyrightClaim()  # "2019", lol, it's like 29th of December
 
     imageGenerateDemo()
@@ -137,5 +141,9 @@ if __name__ == "__main__":
         print(np.array(Image.open("{}.bmp".format(i)).convert(mode="RGB").getchannel("B")))  # converting because original image is monochromatic (have single channel)
         print()
 
+    '''
 
 
+    a = np.array([1, 0, 0, 1, 1, 0, 1, 0, 1]).tolist()
+
+    print(type(a))

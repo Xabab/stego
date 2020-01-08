@@ -19,12 +19,12 @@ def getDCTmatrix(N):
     return dctmatrix
 
 
-def _dct(arr):
-    N = len(arr)
+def _dct(matrix):
+    N = len(matrix)
 
     dctmatrix = getDCTmatrix(N)
 
-    nparr = np.array([np.array(row) for row in arr])
+    nparr = np.array([np.array(row) for row in matrix])
 
     out = np.dot(dctmatrix, nparr)
     out = np.dot(out, dctmatrix.transpose())
@@ -33,12 +33,12 @@ def _dct(arr):
     return out
 
 
-def _dctinv(arr):
-    N = len(arr)
+def _dctinv(matrix):
+    N = len(matrix)
 
     dctmatrix = np.linalg.inv(getDCTmatrix(N))
 
-    nparr = np.array([np.array(row) for row in arr])
+    nparr = np.array([np.array(row) for row in matrix])
 
     out = np.dot(dctmatrix, nparr)
     out = np.dot(out, dctmatrix.transpose())
