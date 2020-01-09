@@ -138,7 +138,7 @@ if __name__ == "__main__":
 
     print()
     for i in paths:
-        print("{}.bmp {}".format(i, "chanтel 'B'"))
+        print("{}.bmp {}".format(i, "channel 'B'"))
         print(np.array(Image.open("{}.bmp".format(i)).convert(mode="RGB").getchannel("B")))  # converting because original image is monochromatic (have single channel)
         print()
 
@@ -154,7 +154,7 @@ Donec gravida eget sapien et tincidunt. Pellentesque non bibendum dui. Quisque n
 
     kj = KochJao.KochJao()
     kj.importImage('l.bmp')
-    kj.dctEnergy = 50
+    kj.dctEnergy = 20
     kj.seed = 1
     kj.window = 3
     kj.setMessage(message)

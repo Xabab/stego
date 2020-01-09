@@ -48,7 +48,7 @@ def applyDct(matrix):
 
     out = np.dot(dctmatrix, nparr)
     out = np.dot(out, dctmatrix.transpose())
-    out = out.astype(dtype=int)
+    # out = out.astype(dtype=int)
 
     return out
 
@@ -62,7 +62,7 @@ def applyInverseDct(matrix):
 
     out = np.dot(dctmatrix, nparr)
     out = np.dot(out, dctmatrix.transpose())
-    out = out.astype(dtype=int)
+    # out = out.astype(dtype=int)
 
     return out
 
@@ -130,7 +130,7 @@ class KochJao(Stego):
         return _ij
 
     def embedBitToTile(self, tile: np.ndarray, bit: str, ij1, ij2):
-        # np.set_printoptions(threshold=10, edgeitems=8, linewidth=100)
+        np.set_printoptions(threshold=10, edgeitems=8, linewidth=150)
 
         dctTile = applyDct(tile)
 
