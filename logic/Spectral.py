@@ -25,8 +25,9 @@ from logic.Stego import Stego
 class Spectral(Stego):
     def __init__(self):
         super().__init__()
-        self.block = None
+        self.blockSide = None
         self.energy = None
+        raise NotImplementedError
 
     @staticmethod
     def getOrthogonalMatrix(side: int) -> np.ndarray:
@@ -77,11 +78,11 @@ class Spectral(Stego):
         # todo check inputs
 
         payload = (np.array(self.payload)*2 - 1).tolist()
-        payload =
+        payload = Spectral._getPayloadBlocks(payload, self.blockSide)
 
-        ortMatrix = Spectral.getOrthogonalMatrix(self.block)
+        ortMatrix = Spectral.getOrthogonalMatrix(self.blockSide)
 
-
+        raise NotImplementedError
 
 
     def extractStegoMessage(self) -> str:

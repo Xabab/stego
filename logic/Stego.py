@@ -27,7 +27,7 @@ class Stego(ABC):
         self._eof = '\00'
 
     def importImage(self, path: str):
-        self.image = Image.open(path)
+        self.image = Image.open(path).convert("RGB")
 
     def setMessage(self, message: str) -> None:
         self.message = message

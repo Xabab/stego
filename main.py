@@ -21,6 +21,7 @@ import numpy as np
 import pprint
 from PIL import Image, ImageChops
 
+from logic import KochJao
 from logic.Quant import Quant
 from logic.Block import Block
 from logic.Cross import Cross
@@ -144,6 +145,27 @@ if __name__ == "__main__":
     '''
 
 
-    a = np.array([1, 0, 0, 1, 1, 0, 1, 0, 1]).tolist()
+    message = """       Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis sollicitudin augue ut augue pretium, a lacinia lacus posuere. 
+        Mauris vel mauris lorem. Etiam varius tempus diam in sodales. Morbi ultricies nisi eu commodo dictum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi tempus tempus malesuada. 
+        Donec gravida eget sapien et tincidunt. Pellentesque non bibendum dui. Quisque non sem sit amet tortor aliquam mollis ac in eros. """
+    print("Initial message:\n")
+    print(message)
+    print()
 
-    print(type(a))
+    b = KochJao.KochJao()
+    b.importImage('l.bmp')
+    b.dctEnergy = 2500
+    b.seed = 1
+    b.window = 0
+    b.setMessage(message)
+    b.generateStegoImage().save("./out/KochJao.bmp")
+
+    b.importImage("./out/KochJao.bmp")
+    print("Retrieved message from 'KochJao.bmp':\n")
+    print(b.extractStegoMessage())
+    print()
+
+    difference(Image.open("./l.bmp"), Image.open("./out/KochJao.bmp")).save("./out/diff KochJao.png")
+
+    print(len(b.payload))
+
