@@ -156,8 +156,7 @@ class KochJao(Stego):
                 try:
                     tiles[n][m] = self.embedBitToTile(tiles[n][m], self.payload[n*len(tiles[0]) + m], ij1, ij2)
                 except IndexError:
-                    b = assembleFromTiles(tiles)
-                    return Image.merge("RGB", (r, g, Image.fromarray(b, mode="L")))
+                    break
 
         b = assembleFromTiles(tiles)
         return Image.merge("RGB", (r, g, Image.fromarray(b, mode="L")))
@@ -243,7 +242,7 @@ class KochJao(Stego):
                 payload.append(self.extractBitFromTile(tiles[n][m], ij1, ij2))
 
 
-        return self.decodePayload(payload)
+        return self.decodePayload(payload, self._eof)
 
 
     def getContainerVolume(self) -> int:
