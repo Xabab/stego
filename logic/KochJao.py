@@ -191,7 +191,7 @@ class KochJao(Stego):
         dbg += "abs diff {}, payload {}, ".format(diff, bit)
 
         if int(bit) == 1:
-            if diff > self.dctEnergy:
+            if diff >= self.dctEnergy:
                 pass
             else:
                 dctTile.itemset(ij1, dct2 + self.dctEnergy)
@@ -217,7 +217,7 @@ class KochJao(Stego):
 
         diff = abs(dct1) - abs(dct2)
 
-        if diff > 0: return 1
+        if diff >= 0: return 1
         else: return 0
 
 

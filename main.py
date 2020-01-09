@@ -146,15 +146,15 @@ if __name__ == "__main__":
 
 
     message = """       Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis sollicitudin augue ut augue pretium, a lacinia lacus posuere. 
-        Mauris vel mauris lorem. Etiam varius tempus diam in sodales. Morbi ultricies nisi eu commodo dictum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi tempus tempus malesuada. 
-        Donec gravida eget sapien et tincidunt. Pellentesque non bibendum dui. Quisque non sem sit amet tortor aliquam mollis ac in eros. """
+Mauris vel mauris lorem. Etiam varius tempus diam in sodales. Morbi ultricies nisi eu commodo dictum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi tempus tempus malesuada. 
+Donec gravida eget sapien et tincidunt. Pellentesque non bibendum dui. Quisque non sem sit amet tortor aliquam mollis ac in eros. """
     print("Initial message:\n")
     print(message)
     print()
 
     kj = KochJao.KochJao()
     kj.importImage('l.bmp')
-    kj.dctEnergy = 25
+    kj.dctEnergy = 50
     kj.seed = 1
     kj.window = 3
     kj.setMessage(message)
