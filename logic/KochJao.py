@@ -12,6 +12,7 @@
 #
 #      You should have received a copy of the GNU General Public License
 #      along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import copy
 import random
 from math import sqrt, cos, pi
@@ -66,27 +67,6 @@ def applyInverseDct(matrix):
     return out
 
 
-def generateQualityMatrix(K, N):
-    matrix = np.ndarray((N, N), dtype=int)
-
-    for y in range(0, N):
-        for x in range(0, N):
-            matrix[x][y] = 1 + (1 + x + y) * K
-
-    return matrix
-
-
-def _jpeg(arr, K):
-    arr = np.array(arr)
-    arr = arr.astype(int)
-
-    out = applyDct(arr)
-    outq = np.divide(out, generateQualityMatrix(K, len(arr))).astype(int)
-    outq = applyInverseDct(np.multiply(outq, generateQualityMatrix(K, len(arr))))
-
-    return outq
-
-
 def devideToTiles(arr, N):
     outNxNtile = []
     outNxNrow = []
@@ -110,24 +90,6 @@ def assembleFromTiles(tiles):
     return np.concatenate(np.concatenate(tiles, axis=1), axis=1)
 
 
-def jpeg(imageAsArray, N, K):
-
-    image = copy.deepcopy(imageAsArray)
-
-    image -= 128
-
-    image = devideToTiles(image, N)
-
-    for tileRowI in range(0, len(image)):
-        for tileI in range(0, len(image[tileRowI])):
-            image[tileRowI][tileI] = _jpeg(image[tileRowI][tileI], K)
-
-    image = assembleFromTiles(image)
-
-    image += 128
-
-    return image
-
 class KochJao(Stego):
     def __init__(self):
         super().__init__()
@@ -143,15 +105,12 @@ class KochJao(Stego):
 
         tiles = devideToTiles(np.array(b), 8)
 
-
         random.seed(self.seed)
-
 
         for n in range(0, len(tiles)):
             for m in range(0, len(tiles[0])):
                 ij1 = self._rollIndex()
                 ij2 = self._rollIndex(ij1)
-
 
                 try:
                     tiles[n][m] = self.embedBitToTile(tiles[n][m], self.payload[n*len(tiles[0]) + m], ij1, ij2)
@@ -223,7 +182,6 @@ class KochJao(Stego):
     def extractStegoMessage(self) -> str:
         # todo check inputs
         # todo check if size mod 8 = 0
-        # todo check window is odd
 
         r, g, b = self.image.split()
 
