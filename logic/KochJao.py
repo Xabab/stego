@@ -166,13 +166,13 @@ class KochJao(Stego):
         i = random.randint(0, 7)
         _ij = (i, (7 - i) + (random.randint(-self.window, self.window)))
 
-        if 0 > _ij[1] >= 8 or _ij == ij:
-            return self._rollIndex()
+        if _ij[1] < 0 or _ij[1] >= 8 or _ij == ij:
+            return self._rollIndex(ij)
 
         return _ij
 
     def embedBitToTile(self, tile: np.ndarray, bit: str, ij1, ij2):
-        np.set_printoptions(threshold=10, edgeitems=8, linewidth=100)
+        # np.set_printoptions(threshold=10, edgeitems=8, linewidth=100)
 
         dctTile = applyDct(tile)
 

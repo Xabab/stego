@@ -152,20 +152,18 @@ if __name__ == "__main__":
     print(message)
     print()
 
-    b = KochJao.KochJao()
-    b.importImage('l.bmp')
-    b.dctEnergy = 50
-    b.seed = 1
-    b.window = 0
-    b.setMessage(message)
-    b.generateStegoImage().save("./out/KochJao.bmp")
+    kj = KochJao.KochJao()
+    kj.importImage('l.bmp')
+    kj.dctEnergy = 25
+    kj.seed = 1
+    kj.window = 3
+    kj.setMessage(message)
+    kj.generateStegoImage().save("./out/KochJao.bmp")
 
-    b.importImage("./out/KochJao.bmp")
+    kj.importImage("./out/KochJao.bmp")
     print("Retrieved message from 'KochJao.bmp':\n")
-    print(b.extractStegoMessage())
+    print(kj.extractStegoMessage())
     print()
 
     difference(Image.open("./l.bmp"), Image.open("./out/KochJao.bmp")).save("./out/diff KochJao.png")
-
-    print(len(b.payload))
 
