@@ -146,17 +146,18 @@ class KochJao(Stego):
 
         random.seed(self.seed)
 
+
         for n in range(0, len(tiles)):
             for m in range(0, len(tiles[0])):
                 ij1 = self._rollIndex()
                 ij2 = self._rollIndex(ij1)
+
 
                 try:
                     tiles[n][m] = self.embedBitToTile(tiles[n][m], self.payload[n*len(tiles[0]) + m], ij1, ij2)
                 except IndexError:
                     b = assembleFromTiles(tiles)
                     return Image.merge("RGB", (r, g, Image.fromarray(b, mode="L")))
-
 
         b = assembleFromTiles(tiles)
         return Image.merge("RGB", (r, g, Image.fromarray(b, mode="L")))
@@ -175,48 +176,46 @@ class KochJao(Stego):
 
         dctTile = applyDct(tile)
 
-        print()
+        # print()
 
-        print((ij1, ij2))
-        print(dctTile)
+        # print((ij1, ij2))
+        # print(dctTile)
 
 
-        dct1 = abs(dctTile.item(ij1))
-        dct2 = abs(dctTile.item(ij2))
+        dct1 = dctTile.item(ij1)
+        dct2 = dctTile.item(ij2)
 
-        diff = dct1 - dct2
+        diff = abs(dct1) - abs(dct2)
 
         dbg = "Old ({}, {}), ".format(dct1, dct2)
-        dbg += "diff {}, payload {}, ".format(diff, bit)
+        dbg += "abs diff {}, payload {}, ".format(diff, bit)
 
-        if str(bit) == 1:
+        if int(bit) == 1:
             if diff > self.dctEnergy:
                 pass
             else:
                 dctTile.itemset(ij1, dct2 + self.dctEnergy)
-        else:  # if str(bit) == 0:
+        else:  # if int(bit) == 0:
             if diff <= -self.dctEnergy:
                 pass
             else:
                 dctTile.itemset(ij2, dct1 + self.dctEnergy)
 
-        dbg += "new ({}, {})".format(abs(dctTile.item(ij1)), abs(dctTile.item(ij2)))
+        dbg += "new ({}, {})".format(dctTile.item(ij1), dctTile.item(ij2))
 
-        print(dctTile)
+        # print(dctTile)
         tile = applyInverseDct(dctTile)
 
-        print(dbg)
+        # print(dbg)
         return tile
 
     def extractBitFromTile(self, tile: np.ndarray, ij1, ij2):
-        dctMatrix = getDctMatrix(8)
-
         dctTile = applyDct(tile)
 
-        dct1 = abs(dctTile.item(ij1))
-        dct2 = abs(dctTile.item(ij2))
+        dct1 = dctTile.item(ij1)
+        dct2 = dctTile.item(ij2)
 
-        diff = dct1 - dct2
+        diff = abs(dct1) - abs(dct2)
 
         if diff > 0: return 1
         else: return 0
@@ -235,12 +234,14 @@ class KochJao(Stego):
 
         payload = []
 
+
         for n in range(0, len(tiles)):
             for m in range(0, len(tiles[0])):
                 ij1 = self._rollIndex()
                 ij2 = self._rollIndex(ij1)
 
                 payload.append(self.extractBitFromTile(tiles[n][m], ij1, ij2))
+
 
         return self.decodePayload(payload)
 

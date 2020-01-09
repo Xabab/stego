@@ -154,7 +154,7 @@ if __name__ == "__main__":
 
     b = KochJao.KochJao()
     b.importImage('l.bmp')
-    b.dctEnergy = 2500
+    b.dctEnergy = 50
     b.seed = 1
     b.window = 0
     b.setMessage(message)
