@@ -81,7 +81,7 @@ class BenhgamMemonEoYoung(KochJao):
 
         dctTile = self.dct2(tile)
 
-        isContrasty = np.max(dctTile) > self.pDctHighLimit
+        isContrasty = np.max(abs(dctTile)) > self.pDctHighLimit
         isPlain     = np.sum(abs(dctTile) < self.pDctLowWindow + np.isclose(dctTile, self.pDctLowWindow, atol=0.49)) \
                       > self.pDctLowCountLimit
 
