@@ -21,7 +21,7 @@ import numpy as np
 import pprint
 from PIL import Image, ImageChops
 
-from logic import KochJao
+from logic import KochJao, BenhgamMemonEoYoung
 from logic.Quant import Quant
 from logic.Block import Block
 from logic.Cross import Cross
@@ -146,24 +146,28 @@ if __name__ == "__main__":
 
 
     message = """       Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis sollicitudin augue ut augue pretium, a lacinia lacus posuere. 
-Mauris vel mauris lorem. Etiam varius tempus diam in sodales. Morbi ultricies nisi eu commodo dictum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi tempus tempus malesuada. 
-Donec gravida eget sapien et tincidunt. Pellentesque non bibendum dui. Quisque non sem sit amet tortor aliquam mollis ac in eros. """
+Mauris vel mauris lorem. Etiam varius tempus diam in sodales. Morbi ultricies nisi eu commodo dictum. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+Donec gravida eget sapien et tincidunt. Pellentesque non bibendum dui. Quisque non sem sit amet tortor aliquam mollis ac in eros."""
+
     print("Initial message:\n")
     print(message)
     print()
 
-    kj = KochJao.KochJao()
+    kj = BenhgamMemonEoYoung.BenhgamMemonEoYoung()
     kj.importImage('l.bmp')
-    kj.dctEnergy = 20
+    kj.dctEnergy = 25
     kj.seed = 1
-    kj.window = 3
+    kj.window = 0
+    kj.pDctLowWindow = 1
+    kj.pDctLowCountLimit = 40
+    kj.pDctHighLimit = 1500
     kj.setMessage(message)
-    kj.generateStegoImage().save("./out/KochJao.bmp")
+    kj.generateStegoImage().save("./out/BenhgamMemonEoYoung.bmp")
 
-    kj.importImage("./out/KochJao.bmp")
-    print("Retrieved message from 'KochJao.bmp':\n")
+    kj.importImage("./out/BenhgamMemonEoYoung.bmp")
+    print("Retrieved message from 'BenhgamMemonEoYoung.bmp':\n")
     print(kj.extractStegoMessage())
     print()
 
-    difference(Image.open("./l.bmp"), Image.open("./out/KochJao.bmp")).save("./out/diff KochJao.png")
+    difference(Image.open("./l.bmp"), Image.open("./out/BenhgamMemonEoYoung.bmp")).save("./out/diff BenhgamMemonEoYoung.png")
 

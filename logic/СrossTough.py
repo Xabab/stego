@@ -17,4 +17,7 @@ from logic.Stego import Stego
 
 
 class CrossTough(Stego):
-    pass
+    def __init__(self):
+        super().__init__()
+
+        raise NotImplementedError

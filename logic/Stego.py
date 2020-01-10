@@ -19,7 +19,7 @@ from PIL import Image
 from typing import List
 
 class Stego(ABC):
-    def __init__(self) -> None:
+    def __init__(self) -> None: # todo change signature for using kwargs
         self.image = None
         self.stegoImage = None
         self.payload = None
@@ -33,8 +33,8 @@ class Stego(ABC):
         self.message = message
         self.payload = self.encodePayload(message, self._eof)
 
-
-    def encodePayload(self, string: str, eof: str = "") -> List[int]:
+    @staticmethod
+    def encodePayload(string: str, eof: str = "") -> List[int]:
         byteListString = ''
         for i in bytearray(string + eof, encoding='utf-8'):
             byteListString += format(i, '#010b')[2:]

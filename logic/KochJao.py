@@ -14,12 +14,14 @@
 #      along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import copy
+import os
 import random
 from math import sqrt, cos, pi
-from typing import Tuple
+from typing import Tuple, List
 
 import numpy as np
 from PIL import Image
+from scipy.fft import dct, idct
 
 from logic.Stego import Stego
 
@@ -67,27 +69,7 @@ def applyInverseDct(matrix):
     return out
 
 
-def devideToTiles(arr, N):
-    outNxNtile = []
-    outNxNrow = []
-    outNxNarray = []
 
-    for y in range(0, len(arr), N):
-        for x in range(0, len(arr), N):
-            for subrow in arr[y: y+N]:
-                outNxNtile.append(subrow[x:x+N])
-            outNxNrow.append(outNxNtile)
-            outNxNtile = []
-        outNxNarray.append(outNxNrow)
-        outNxNrow = []
-
-    outNxNarray = np.array(outNxNarray)
-
-    return outNxNarray
-
-
-def assembleFromTiles(tiles):
-    return np.concatenate(np.concatenate(tiles, axis=1), axis=1)
 
 
 class KochJao(Stego):
@@ -97,42 +79,80 @@ class KochJao(Stego):
         self.window = None     # as distance from the second diagonal
         self.seed = None
 
+    def dct2(self, matrix):
+        return dct(dct(matrix.T, norm='ortho').T, norm='ortho')
+
+    def idct2(self, matrix):
+        return idct(idct(matrix.T, norm='ortho').T, norm='ortho')
+
+    def devideToTiles(self, arr, N):
+        outNxNtile = []
+        outNxNrow = []
+        outNxNarray = []
+
+        for y in range(0, len(arr), N):
+            for x in range(0, len(arr), N):
+                for subrow in arr[y: y + N]:
+                    outNxNtile.append(subrow[x:x + N])
+                outNxNrow.append(outNxNtile)
+                outNxNtile = []
+            outNxNarray.append(outNxNrow)
+            outNxNrow = []
+
+        outNxNarray = np.array(outNxNarray)
+
+        return outNxNarray
+
+    def assembleFromTiles(self, tiles):
+        return np.concatenate(np.concatenate(tiles, axis=1), axis=1)
+
+    def _rollIndex(self, ij: List[Tuple[int, int]] = None):
+        if ij is None:
+            ij = []
+
+        i = random.randint(0, 7)
+        newIj = (i, (7 - i) + (random.randint(-self.window, self.window)))
+
+        if newIj[1] < 0 or newIj[1] >= 8 or newIj in ij:
+            return self._rollIndex(ij)
+
+        return newIj
+
     def generateStegoImage(self) -> Image:
         # todo check inputs
         # todo check if size mod 8 = 0
 
         r, g, b = self.image.split()
 
-        tiles = devideToTiles(np.array(b), 8)
+        tiles = self.devideToTiles(np.array(b), 8)
 
         random.seed(self.seed)
+
+        # os.remove("write.txt")
+        # f = open("write.txt", "w+")
 
         for n in range(0, len(tiles)):
             for m in range(0, len(tiles[0])):
                 ij1 = self._rollIndex()
-                ij2 = self._rollIndex(ij1)
+                ij2 = self._rollIndex([ij1])
+
+                # f.write(str((ij1, ij2)) + "\n")
 
                 try:
                     tiles[n][m] = self.embedBitToTile(tiles[n][m], self.payload[n*len(tiles[0]) + m], ij1, ij2)
                 except IndexError:
-                    break
+                    continue
 
-        b = assembleFromTiles(tiles)
+        # f.close()
+
+        b = self.assembleFromTiles(tiles)
         return Image.merge("RGB", (r, g, Image.fromarray(b, mode="L")))
 
-    def _rollIndex(self, ij: Tuple[int, int] = (-1, -1)):
-        i = random.randint(0, 7)
-        _ij = (i, (7 - i) + (random.randint(-self.window, self.window)))
-
-        if _ij[1] < 0 or _ij[1] >= 8 or _ij == ij:
-            return self._rollIndex(ij)
-
-        return _ij
 
     def embedBitToTile(self, tile: np.ndarray, bit: str, ij1, ij2):
         np.set_printoptions(threshold=10, edgeitems=8, linewidth=150)
 
-        dctTile = applyDct(tile)
+        dctTile = self.dct2(tile)
 
         # print()
 
@@ -140,43 +160,45 @@ class KochJao(Stego):
         # print(dctTile)
 
 
-        dct1 = dctTile.item(ij1)
-        dct2 = dctTile.item(ij2)
+        dctItem1 = dctTile.item(ij1)
+        dctItem2 = dctTile.item(ij2)
 
-        diff = abs(dct1) - abs(dct2)
+        diff = abs(dctItem1) - abs(dctItem2)
 
-        dbg = "Old ({}, {}), ".format(dct1, dct2)
-        dbg += "abs diff {}, payload {}, ".format(diff, bit)
+        # dbg = "Old ({}, {}), ".format(dctItem1, dctItem2)
+        # dbg += "abs diff {}, payload {}, ".format(diff, bit)
 
-        if int(bit) == 1:
-            if diff >= self.dctEnergy:
+        if int(bit) == 0:
+            if diff > self.dctEnergy:
                 pass
             else:
-                dctTile.itemset(ij1, dct2 + self.dctEnergy)
-        else:  # if int(bit) == 0:
-            if diff <= -self.dctEnergy:
+                dctTile.itemset(ij1, (abs(dctItem2) + self.dctEnergy)*np.sign(dctItem1))
+        else:  # if int(bit) == 1:
+            if diff < -self.dctEnergy:
                 pass
             else:
-                dctTile.itemset(ij2, dct1 + self.dctEnergy)
+                dctTile.itemset(ij2, (abs(dctItem1) + self.dctEnergy)*np.sign(dctItem1))
 
-        dbg += "new ({}, {})".format(dctTile.item(ij1), dctTile.item(ij2))
+        # dbg += "new ({}, {})".format(dctTile.item(ij1), dctTile.item(ij2))
 
         # print(dctTile)
-        tile = applyInverseDct(dctTile)
+        tile = self.idct2(dctTile)
 
         # print(dbg)
         return tile
 
     def extractBitFromTile(self, tile: np.ndarray, ij1, ij2):
-        dctTile = applyDct(tile)
+        dctTile = self.dct2(tile)
 
-        dct1 = dctTile.item(ij1)
-        dct2 = dctTile.item(ij2)
+        # print(dctTile.astype(int))
 
-        diff = abs(dct1) - abs(dct2)
+        dctItem1 = dctTile.item(ij1)
+        dctItem2 = dctTile.item(ij2)
 
-        if diff >= 0: return 1
-        else: return 0
+        diff = abs(dctItem1) - abs(dctItem2)
+
+        if diff >= 0: return 0
+        else: return 1
 
 
     def extractStegoMessage(self) -> str:
@@ -185,20 +207,25 @@ class KochJao(Stego):
 
         r, g, b = self.image.split()
 
-        tiles = devideToTiles(np.array(b), 8)
+        tiles = self.devideToTiles(np.array(b), 8)
 
         random.seed(self.seed)
 
         payload = []
 
+        # os.remove("read.txt")
+        # f = open("read.txt", "w+")
 
         for n in range(0, len(tiles)):
             for m in range(0, len(tiles[0])):
                 ij1 = self._rollIndex()
-                ij2 = self._rollIndex(ij1)
+                ij2 = self._rollIndex([ij1])
+
+                # f.write(str((ij1, ij2)) + "\n")
 
                 payload.append(self.extractBitFromTile(tiles[n][m], ij1, ij2))
 
+        # f.close()
 
         return self.decodePayload(payload, self._eof)
 
