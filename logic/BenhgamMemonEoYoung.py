@@ -64,12 +64,13 @@ class BenhgamMemonEoYoung(KochJao):
                     i += 1
 
         if i < len(self.payload):
-            warn("Payload exceeds container volume, message is fragmented", stacklevel=2)
+            warn("Payload exceeds container volume, message will is fragmented.", stacklevel=2)
 
         if i == 0:
-            warn("Payload wasn't writen", stacklevel=2)
+            warn("Unsatisfactory values. Payload wasn't writen.", stacklevel=2)
 
         tiles = np.around(tiles)
+        tiles = np.clip(tiles, a_min = 0, a_max = 255)
 
         b = self.assembleFromTiles(tiles)
 
@@ -81,7 +82,7 @@ class BenhgamMemonEoYoung(KochJao):
         dctTile = self.dct2(tile)
 
         isContrasty = np.max(dctTile) > self.pDctHighLimit
-        isPlain     = np.sum(abs(dctTile) < self.pDctLowWindow + np.isclose(dctTile, self.pDctLowWindow, atol=0.5)) \
+        isPlain     = np.sum(abs(dctTile) < self.pDctLowWindow + np.isclose(dctTile, self.pDctLowWindow, atol=0.49)) \
                       > self.pDctLowCountLimit
 
         # if (isContrasty or isPlain): print(np.round(dctTile).astype('int'))
