@@ -25,7 +25,7 @@ from logic import KochZhao, BenhamMemonYeoYeung
 from logic.Quant import Quant
 from logic.Block import Block
 from logic.Cross import Cross
-from logic.Spectral import Spectral
+
 
 
 def exadurate(image: Image, diff: Image) -> Image:

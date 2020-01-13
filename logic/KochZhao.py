@@ -24,52 +24,8 @@ from PIL import Image
 from scipy.fft import dct, idct
 
 from logic.Stego import Stego
-
-def c(i, j, N):
-    if i == 0:
-        return 1/sqrt(N)
-    else:
-        return sqrt(2/N) * cos((2*j + 1) * i * pi / (2 * N))
-
-
-def getDctMatrix(N):
-    dctmatrix = np.ndarray((N, N), dtype=float)
-    for i in range(0, N):
-        for j in range(0, N):
-            dctmatrix[i][j] = c(i, j, N)
-
-    return dctmatrix
-
-
-def applyDct(matrix):
-    N = len(matrix)
-
-    dctmatrix = getDctMatrix(N)
-
-    nparr = np.array([np.array(row) for row in matrix])
-
-    out = np.dot(dctmatrix, nparr)
-    out = np.dot(out, dctmatrix.transpose())
-    # out = out.astype(dtype=int)
-
-    return out
-
-
-def applyInverseDct(matrix):
-    N = len(matrix)
-
-    dctmatrix = np.linalg.inv(getDctMatrix(N))
-
-    nparr = np.array([np.array(row) for row in matrix])
-
-    out = np.dot(dctmatrix, nparr)
-    out = np.dot(out, dctmatrix.transpose())
-    # out = out.astype(dtype=int)
-
-    return out
-
-
-
+from logic.util.dctEssentials import *
+from logic.util.rollDiagonalIndex import *
 
 
 class KochZhao(Stego):
@@ -79,52 +35,13 @@ class KochZhao(Stego):
         self.window = None     # as distance from the second diagonal
         self.seed = None
 
-    def dct2(self, matrix):
-        return dct(dct(matrix.T, norm='ortho').T, norm='ortho')
-
-    def idct2(self, matrix):
-        return idct(idct(matrix.T, norm='ortho').T, norm='ortho')
-
-    def devideToTiles(self, arr, N):
-        outNxNtile = []
-        outNxNrow = []
-        outNxNarray = []
-
-        for y in range(0, len(arr), N):
-            for x in range(0, len(arr), N):
-                for subrow in arr[y: y + N]:
-                    outNxNtile.append(subrow[x:x + N])
-                outNxNrow.append(outNxNtile)
-                outNxNtile = []
-            outNxNarray.append(outNxNrow)
-            outNxNrow = []
-
-        outNxNarray = np.array(outNxNarray)
-
-        return outNxNarray
-
-    def assembleFromTiles(self, tiles):
-        return np.concatenate(np.concatenate(tiles, axis=1), axis=1)
-
-    def _rollIndex(self, ij: List[Tuple[int, int]] = None):
-        if ij is None:
-            ij = []
-
-        i = random.randint(0, 7)
-        newIj = (i, (7 - i) + (random.randint(-self.window, self.window)))
-
-        if newIj[1] < 0 or newIj[1] >= 8 or newIj in ij:
-            return self._rollIndex(ij)
-
-        return newIj
-
     def generateStegoImage(self) -> Image:
         # todo check inputs
         # todo check if size mod 8 = 0
 
         r, g, b = self._image.split()
 
-        tiles = self.devideToTiles(np.array(b), 8)
+        tiles = devideToTiles(np.array(b), 8)
 
         random.seed(self.seed)
 
@@ -133,8 +50,8 @@ class KochZhao(Stego):
 
         for n in range(0, len(tiles)):
             for m in range(0, len(tiles[0])):
-                ij1 = self._rollIndex()
-                ij2 = self._rollIndex([ij1])
+                ij1 = rollDiagonalIndex(self.window)
+                ij2 = rollDiagonalIndex(self.window, [ij1])
 
                 # f.write(str((ij1, ij2)) + "\n")
 
@@ -145,14 +62,14 @@ class KochZhao(Stego):
 
         # f.close()
 
-        b = self.assembleFromTiles(tiles)
+        b = assembleFromTiles(tiles)
         return Image.merge("RGB", (r, g, Image.fromarray(b, mode="L")))
 
 
     def embedBitToTile(self, tile: np.ndarray, bit: str, ij1, ij2):
         np.set_printoptions(threshold=10, edgeitems=8, linewidth=150)
 
-        dctTile = self.dct2(tile)
+        dctTile = dct2(tile)
 
         # print()
 
@@ -182,13 +99,13 @@ class KochZhao(Stego):
         # dbg += "new ({}, {})".format(dctTile.item(ij1), dctTile.item(ij2))
 
         # print(dctTile)
-        tile = self.idct2(dctTile)
+        tile = idct2(dctTile)
 
         # print(dbg)
         return tile
 
     def extractBitFromTile(self, tile: np.ndarray, ij1, ij2):
-        dctTile = self.dct2(tile)
+        dctTile = dct2(tile)
 
         # print(dctTile.astype(int))
 
@@ -207,7 +124,7 @@ class KochZhao(Stego):
 
         r, g, b = self._image.split()
 
-        tiles = self.devideToTiles(np.array(b), 8)
+        tiles = devideToTiles(np.array(b), 8)
 
         random.seed(self.seed)
 
@@ -218,8 +135,8 @@ class KochZhao(Stego):
 
         for n in range(0, len(tiles)):
             for m in range(0, len(tiles[0])):
-                ij1 = self._rollIndex()
-                ij2 = self._rollIndex([ij1])
+                ij1 = rollDiagonalIndex(self.window)
+                ij2 = rollDiagonalIndex(self.window, [ij1])
 
                 # f.write(str((ij1, ij2)) + "\n")
 

@@ -48,7 +48,7 @@ class Quant(Stego):
         return self._image.size[0] * self._image.size[1] - 1
 
     def generateStegoImage(self) -> Image:
-        if self.key   is None: raise TypeError
+        if self.key    is None: raise TypeError
         if self._image is None: raise TypeError
         if self.getContainerVolume() < len(self._payload):
             raise ValueError("Payload ({} bits) bigger than container volume ({} bits)".format(len(self._payload),
@@ -77,7 +77,7 @@ class Quant(Stego):
 
 
     def extractStegoMessage(self) -> str:
-        if self.key   is None: raise TypeError
+        if self.key    is None: raise TypeError
         if self._image is None: raise TypeError
 
         byteList = []

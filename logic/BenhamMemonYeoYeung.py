@@ -22,11 +22,15 @@ import numpy as np
 from PIL import Image
 
 from logic.KochZhao import KochZhao
+from logic.Stego import Stego
+from logic.util.dctEssentials import *
+from logic.util.rollDiagonalIndex import rollDiagonalIndex
 
 
-class BenhamMemonYeoYeung(KochZhao):
+class BenhamMemonYeoYeung(Stego):
     def __init__(self):
         super().__init__()
+        self.window = None
         self.pDctHighLimit = None
         self.pDctLowWindow = None
         self.pDctLowCountLimit = None
@@ -37,7 +41,7 @@ class BenhamMemonYeoYeung(KochZhao):
 
         r, g, b = self._image.split()
 
-        tiles = self.devideToTiles(np.array(b), 8)
+        tiles = devideToTiles(np.array(b), 8)
 
         random.seed(self.seed)
 
@@ -53,9 +57,9 @@ class BenhamMemonYeoYeung(KochZhao):
                 except IndexError:
                     continue
 
-                ij1 = self._rollIndex()
-                ij2 = self._rollIndex([ij1])
-                ij3 = self._rollIndex([ij1, ij2])
+                ij1 = rollDiagonalIndex(self.window)
+                ij2 = rollDiagonalIndex(self.window, [ij1])
+                ij3 = rollDiagonalIndex(self.window, [ij1, ij2])
 
 
                 tiles[n][m] = self.embedBitToTile(tiles[n][m], self._payload[i], ij1, ij2, ij3)
@@ -72,14 +76,14 @@ class BenhamMemonYeoYeung(KochZhao):
         tiles = np.around(tiles)
         tiles = np.clip(tiles, a_min = 0, a_max = 255)
 
-        b = self.assembleFromTiles(tiles)
+        b = assembleFromTiles(tiles)
 
         return Image.merge("RGB", (r, g, Image.fromarray(b, mode="L")))
 
     def tileIsAcceptable(self, tile: np.ndarray):
         # return True
 
-        dctTile = self.dct2(tile)
+        dctTile = dct2(tile)
 
         isContrasty = np.max(abs(dctTile)) > self.pDctHighLimit
 
@@ -98,7 +102,7 @@ class BenhamMemonYeoYeung(KochZhao):
     def embedBitToTile(self, tile: np.ndarray, bit: str, ij1, ij2, ij3):
         np.set_printoptions(threshold=10, edgeitems=8, linewidth=150)
 
-        dctTile = self.dct2(tile)
+        dctTile = dct2(tile)
 
 
         dctItem1 = dctTile.item(ij1)
@@ -119,12 +123,12 @@ class BenhamMemonYeoYeung(KochZhao):
             if not abs(dctItem2) - abs(dctItem3) < -self.dctEnergy:
                 dctTile.itemset(ij3, (abs(dctItem2) + self.dctEnergy)*np.sign(dctItem2))
 
-        tile = self.idct2(dctTile)
+        tile = idct2(dctTile)
 
         return tile
 
     def extractBitFromTile(self, tile: np.ndarray, ij1, ij2, ij3):
-        dctTile = self.dct2(tile)
+        dctTile = dct2(tile)
 
         dctItem1 = dctTile.item(ij1)
         dctItem2 = dctTile.item(ij2)
@@ -148,7 +152,7 @@ class BenhamMemonYeoYeung(KochZhao):
 
         r, g, b = self._image.split()
 
-        tiles = self.devideToTiles(np.array(b), 8)
+        tiles = devideToTiles(np.array(b), 8)
 
         random.seed(self.seed)
 
@@ -159,9 +163,9 @@ class BenhamMemonYeoYeung(KochZhao):
                 if not self.tileIsAcceptable(tiles[n][m]):
                     continue
 
-                ij1 = self._rollIndex()
-                ij2 = self._rollIndex([ij1])
-                ij3 = self._rollIndex([ij1, ij2])
+                ij1 = rollDiagonalIndex(self.window)
+                ij2 = rollDiagonalIndex(self.window, [ij1])
+                ij3 = rollDiagonalIndex(self.window, [ij1, ij2])
 
                 payload.append(self.extractBitFromTile(tiles[n][m], ij1, ij2, ij3))
 

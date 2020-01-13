@@ -12,11 +12,18 @@
 #
 #      You should have received a copy of the GNU General Public License
 #      along with this program.  If not, see <https://www.gnu.org/licenses/>.
-from logic.KochZhao import KochZhao
+import random
+from typing import List, Tuple
 
 
-class JessicaFridrich(KochZhao):
-    def __init__(self):
-        super().__init__()
+def rollDiagonalIndex(window: int, ij: List[Tuple[int, int]] = None, matrixSideSize: int = 8):
+    if ij is None:
+        ij = []
 
-        self.
+    i = random.randint(0, matrixSideSize - 1)
+    newIj = (i, (matrixSideSize - 1 - i) + (random.randint(-window, window)))
+
+    if newIj[1] < 0 or newIj[1] >= 8 or newIj in ij:
+        return rollDiagonalIndex(window, ij, matrixSideSize)
+
+    return newIj
