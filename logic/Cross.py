@@ -35,10 +35,10 @@ class Cross(Stego):
 
     def getContainerVolume(self) -> int:
         if self.interval    is None: raise TypeError
-        if self.image       is None: raise TypeError
+        if self._image       is None: raise TypeError
         if self.repeatCount is None: raise TypeError
 
-        return self.image.size[0] * self.image.size[1] // self.interval
+        return self._image.size[0] * self._image.size[1] // self.interval
 
 
     def encodePayload(self, string: str, eof: str = "") -> List[int]:
@@ -56,24 +56,24 @@ class Cross(Stego):
         return super().decodePayload(byteListClean, eof)
 
     def generateStegoImage(self) -> Image:
-        if self.payload     is None: raise TypeError
-        if self.image       is None: raise TypeError
+        if self._payload     is None: raise TypeError
+        if self._image       is None: raise TypeError
         if self.seed        is None: raise TypeError
         if self.interval    is None: raise TypeError
         if self.energy      is None: raise TypeError
         if self.repeatCount is None: raise TypeError
-        if self.getContainerVolume() < len(self.payload):
-            warningMessage = "Payload ({} bits) bigger than guaranteed container volume ({} bits). Message might be fragmented.".format(len(self.payload), self.getContainerVolume())
+        if self.getContainerVolume() < len(self._payload):
+            warningMessage = "Payload ({} bits) bigger than guaranteed container volume ({} bits). Message might be fragmented.".format(len(self._payload), self.getContainerVolume())
             warn(warningMessage, stacklevel=2)  # stacklevel=2 because it's not generateStegoImage's fault that payload is bigger than volume
 
-        image = self.image.copy()
+        image = self._image.copy()
         i = 0
         iPx = 0
         random.seed(self.seed)
-        size = self.image.size
-        while i < len(self.payload) and iPx < size[0] * size[1]:
-            px = self.image.getpixel((iPx % size[1], (iPx // size[0])))
-            if self.payload[i] == 0:
+        size = self._image.size
+        while i < len(self._payload) and iPx < size[0] * size[1]:
+            px = self._image.getpixel((iPx % size[1], (iPx // size[0])))
+            if self._payload[i] == 0:
                 pxB = max(0, int(px[2] - self.energy * self._getLuminosity(px)))
             else:
                 pxB = min(255, int(px[2] + self.energy * self._getLuminosity(px)))
@@ -88,7 +88,7 @@ class Cross(Stego):
         return image
 
     def extractStegoMessage(self) -> str:
-        if self.image    is None: raise TypeError
+        if self._image    is None: raise TypeError
         if self.seed     is None: raise TypeError
         if self.interval is None: raise TypeError
         if self.cross    is None: raise TypeError
@@ -97,24 +97,24 @@ class Cross(Stego):
 
         iPx = 0
         random.seed(self.seed)
-        while iPx < self.image.size[0] * self.image.size[1]:
-            y = iPx // self.image.size[0]
-            x = iPx % self.image.size[1]
+        while iPx < self._image.size[0] * self._image.size[1]:
+            y = iPx // self._image.size[0]
+            x = iPx % self._image.size[1]
 
             crossMean = []
 
             for i in range(1, self.cross + 1):
                 tempXY = [
                           (max(x - i, 0),                      y),
-                          (min(x + i, self.image.size[1] - 1), y),
+                          (min(x + i, self._image.size[1] - 1), y),
                           (x,                      max(y - i, 0)),
-                          (x, min(y + i, self.image.size[0] - 1))]
+                          (x, min(y + i, self._image.size[0] - 1))]
 
-                crossMean.extend([self.image.getpixel(i)[2] for i in tempXY])
+                crossMean.extend([self._image.getpixel(i)[2] for i in tempXY])
 
             crossMean = mean(crossMean)
 
-            if self.image.getpixel((x, y))[2] > crossMean:
+            if self._image.getpixel((x, y))[2] > crossMean:
                 byteList.append(1)
             else:
                 byteList.append(0)

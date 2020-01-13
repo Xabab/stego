@@ -20,18 +20,17 @@ from typing import List
 
 class Stego(ABC):
     def __init__(self) -> None: # todo change signature for using kwargs
-        self.image = None
-        self.stegoImage = None
-        self.payload = None
+        self._image = None
+        self._payload = None
         self.message = None
         self._eof = '\00'
 
     def importImage(self, path: str):
-        self.image = Image.open(path).convert("RGB")
+        self._image = Image.open(path).convert("RGB")
 
     def setMessage(self, message: str) -> None:
         self.message = message
-        self.payload = self.encodePayload(message, self._eof)
+        self._payload = self.encodePayload(message, self._eof)
 
     @staticmethod
     def encodePayload(string: str, eof: str = "") -> List[int]:

@@ -122,7 +122,7 @@ class KochJao(Stego):
         # todo check inputs
         # todo check if size mod 8 = 0
 
-        r, g, b = self.image.split()
+        r, g, b = self._image.split()
 
         tiles = self.devideToTiles(np.array(b), 8)
 
@@ -139,7 +139,7 @@ class KochJao(Stego):
                 # f.write(str((ij1, ij2)) + "\n")
 
                 try:
-                    tiles[n][m] = self.embedBitToTile(tiles[n][m], self.payload[n*len(tiles[0]) + m], ij1, ij2)
+                    tiles[n][m] = self.embedBitToTile(tiles[n][m], self._payload[n * len(tiles[0]) + m], ij1, ij2)
                 except IndexError:
                     continue
 
@@ -205,7 +205,7 @@ class KochJao(Stego):
         # todo check inputs
         # todo check if size mod 8 = 0
 
-        r, g, b = self.image.split()
+        r, g, b = self._image.split()
 
         tiles = self.devideToTiles(np.array(b), 8)
 
@@ -233,4 +233,4 @@ class KochJao(Stego):
     def getContainerVolume(self) -> int:
         # todo check inputs
 
-        return (self.image.size[0]//8) * (self.image.size[1]//8)
+        return (self._image.size[0] // 8) * (self._image.size[1] // 8)

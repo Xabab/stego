@@ -77,7 +77,7 @@ class Spectral(Stego):
     def generateStegoImage(self) -> Image:
         # todo check inputs
 
-        payload = (np.array(self.payload)*2 - 1).tolist()
+        payload = (np.array(self._payload) * 2 - 1).tolist()
         payload = Spectral._getPayloadBlocks(payload, self.blockSide)
 
         ortMatrix = Spectral.getOrthogonalMatrix(self.blockSide)

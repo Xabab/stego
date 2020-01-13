@@ -35,7 +35,7 @@ class BenhgamMemonEoYoung(KochJao):
         # todo check inputs
         # todo check if size mod 8 = 0
 
-        r, g, b = self.image.split()
+        r, g, b = self._image.split()
 
         tiles = self.devideToTiles(np.array(b), 8)
 
@@ -49,7 +49,7 @@ class BenhgamMemonEoYoung(KochJao):
                     continue
 
                 try:
-                    self.payload[i]
+                    self._payload[i]
                 except IndexError:
                     continue
 
@@ -58,12 +58,12 @@ class BenhgamMemonEoYoung(KochJao):
                 ij3 = self._rollIndex([ij1, ij2])
 
 
-                tiles[n][m] = self.embedBitToTile(tiles[n][m], self.payload[i], ij1, ij2, ij3)
+                tiles[n][m] = self.embedBitToTile(tiles[n][m], self._payload[i], ij1, ij2, ij3)
 
                 if self.tileIsAcceptable(tiles[n][m]):  # for extracting
                     i += 1
 
-        if i < len(self.payload):
+        if i < len(self._payload):
             warn("Payload exceeds container volume, message will is fragmented.", stacklevel=2)
 
         if i == 0:
@@ -82,8 +82,13 @@ class BenhgamMemonEoYoung(KochJao):
         dctTile = self.dct2(tile)
 
         isContrasty = np.max(abs(dctTile)) > self.pDctHighLimit
-        isPlain     = np.sum(abs(dctTile) < self.pDctLowWindow + np.isclose(dctTile, self.pDctLowWindow, atol=0.49)) \
-                      > self.pDctLowCountLimit
+
+        # line below creates a boolean matrix map for elements satisfying that expression and sums it effectively
+        # counting such elements because python boolean is in fact an 1/0 integer.
+        # isclose is there for compensating int rounding after dct/idct
+
+        isPlain = np.sum(abs(dctTile) < self.pDctLowWindow + np.isclose(dctTile, self.pDctLowWindow, atol=0.51)) \
+                  > self.pDctLowCountLimit
 
         # if (isContrasty or isPlain): print(np.round(dctTile).astype('int'))
         return not (isContrasty or isPlain)
@@ -141,7 +146,7 @@ class BenhgamMemonEoYoung(KochJao):
         # todo check inputs
         # todo check if size mod 8 = 0
 
-        r, g, b = self.image.split()
+        r, g, b = self._image.split()
 
         tiles = self.devideToTiles(np.array(b), 8)
 
@@ -161,7 +166,7 @@ class BenhgamMemonEoYoung(KochJao):
                 payload.append(self.extractBitFromTile(tiles[n][m], ij1, ij2, ij3))
 
         print("[Debug] Initial payload:")
-        print(''.join([str(i) for i in self.payload]))
+        print(''.join([str(i) for i in self._payload]))
         print("[Debug] Extracted payload:")
         print(''.join([str(i) for i in payload]))
         print()
@@ -172,4 +177,4 @@ class BenhgamMemonEoYoung(KochJao):
     def getContainerVolume(self) -> int:
         # todo check inputs
 
-        return (self.image.size[0]//8) * (self.image.size[1]//8)
+        return (self._image.size[0] // 8) * (self._image.size[1] // 8)

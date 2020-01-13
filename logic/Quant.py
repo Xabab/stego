@@ -45,28 +45,28 @@ class Quant(Stego):
         return key
 
     def getContainerVolume(self) -> int:
-        return self.image.size[0] * self.image.size[1] - 1
+        return self._image.size[0] * self._image.size[1] - 1
 
     def generateStegoImage(self) -> Image:
         if self.key   is None: raise TypeError
-        if self.image is None: raise TypeError
-        if self.getContainerVolume() < len(self.payload):
-            raise ValueError("Payload ({} bits) bigger than container volume ({} bits)".format(len(self.payload),
+        if self._image is None: raise TypeError
+        if self.getContainerVolume() < len(self._payload):
+            raise ValueError("Payload ({} bits) bigger than container volume ({} bits)".format(len(self._payload),
                                                                                                self.getContainerVolume()))
-        tempImg = self.image.copy()
+        tempImg = self._image.copy()
 
         indices = [[i for i, x in enumerate(self.key["value"]) if x == 0],
                    [i for i, x in enumerate(self.key["value"]) if x == 1]]
 
-        for i in range(0, len(self.payload)):
-            xy0 = ( i      % self.image.size[1],  i      // self.image.size[0])
-            xy1 = ((i + 1) % self.image.size[1], (i + 1) // self.image.size[0])
+        for i in range(0, len(self._payload)):
+            xy0 = (i % self._image.size[1], i // self._image.size[0])
+            xy1 = ((i + 1) % self._image.size[1], (i + 1) // self._image.size[0])
 
             px0 = tempImg.getpixel(xy0)
             px1 = tempImg.getpixel(xy1)
 
             index = self.key["difference"].index(px1[2] - px0[2])
-            closestValueIndex = min(indices[self.payload[i]], key=lambda x: abs(x - index))
+            closestValueIndex = min(indices[self._payload[i]], key=lambda x: abs(x - index))
 
             px1 = (px1[0], px1[1], px0[2] + self.key["difference"][closestValueIndex])
 
@@ -78,16 +78,16 @@ class Quant(Stego):
 
     def extractStegoMessage(self) -> str:
         if self.key   is None: raise TypeError
-        if self.image is None: raise TypeError
+        if self._image is None: raise TypeError
 
         byteList = []
 
-        for i in range(0, self.image.size[0] * self.image.size[1] - 1):
-            xy0 = ( i      % self.image.size[1],  i      // self.image.size[0])
-            xy1 = ((i + 1) % self.image.size[1], (i + 1) // self.image.size[0])
+        for i in range(0, self._image.size[0] * self._image.size[1] - 1):
+            xy0 = (i % self._image.size[1], i // self._image.size[0])
+            xy1 = ((i + 1) % self._image.size[1], (i + 1) // self._image.size[0])
 
-            px0 = self.image.getpixel(xy0)
-            px1 = self.image.getpixel(xy1)
+            px0 = self._image.getpixel(xy0)
+            px1 = self._image.getpixel(xy1)
 
             byteList.append(self.key["value"][self.key["difference"].index(px1[2] - px0[2])])
 
