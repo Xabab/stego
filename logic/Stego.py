@@ -38,22 +38,22 @@ class Stego(ABC):
 
     @staticmethod
     def encodePayload(string: str, eof: str = "") -> List[int]:
-        byteListString = ''
+        bitListString = ''
         for i in bytearray(string + eof, encoding='utf-8'):
-            byteListString += format(i, '#010b')[2:]
+            bitListString += format(i, '#010b')[2:]
 
-        byteArray = []
-        for bit in byteListString:
-            byteArray.append(int(bit))
+        bitArray = []
+        for bit in bitListString:
+            bitArray.append(int(bit))
 
-        return byteArray
+        return bitArray
 
-
-    def decodePayload(self, byteList: List[int], eof: str = "") -> str:
+    @staticmethod
+    def decodePayload(bitList: List[int], eof: str = "") -> str:
         string = ''
 
-        for i in range(0, len(byteList), 8):
-            char = chr(int(''.join(str(b) for b in byteList[i: i + 8]), 2))  # for heck's sake
+        for i in range(0, len(bitList), 8):
+            char = chr(int(''.join(str(b) for b in bitList[i: i + 8]), 2))  # for heck's sake
             string += char
 
             if string[-len(eof):] == eof:

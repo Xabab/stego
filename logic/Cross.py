@@ -42,18 +42,18 @@ class Cross(Stego):
 
 
     def encodePayload(self, string: str, eof: str = "") -> List[int]:
-        byteArray = super().encodePayload(string, eof)
-        byteArray = [x for item in byteArray for x in repeat(item, self.repeatCount)]
+        bitList = super().encodePayload(string, eof)
+        bitList = [x for item in bitList for x in repeat(item, self.repeatCount)]
 
-        return byteArray
+        return bitList
 
-    def decodePayload(self, byteList: List[int], eof: str = "") -> str:
-        byteListClean = []
+    def decodePayload(self, bitList: List[int], eof: str = "") -> str:
+        bitListClean = []
 
-        for i in range(0, len(byteList), self.repeatCount):
-            byteListClean.append(int(round(mean(byteList[i:i+self.repeatCount]))))
+        for i in range(0, len(bitList), self.repeatCount):
+            bitListClean.append(int(round(mean(bitList[i:i + self.repeatCount]))))
 
-        return super().decodePayload(byteListClean, eof)
+        return super().decodePayload(bitListClean, eof)
 
     def generateStegoImage(self) -> Image:
         if self._payload     is None: raise TypeError
