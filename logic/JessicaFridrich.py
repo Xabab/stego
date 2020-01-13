@@ -1,4 +1,4 @@
-#  Copyright (c) 2019 Xabab
+#  Copyright © 2020 Xabab
 #
 #      This program is free software: you can redistribute it and/or modify
 #      it under the terms of the GNU General Public License as published by
@@ -12,12 +12,8 @@
 #
 #      You should have received a copy of the GNU General Public License
 #      along with this program.  If not, see <https://www.gnu.org/licenses/>.
+from logic.KochZhao import KochZhao
 
-from logic.Stego import Stego
 
-
-class CrossTough(Stego):
-    def __init__(self):
-        super().__init__()
-
-        raise NotImplementedError
+class JessicaFridrich(KochZhao):
+    pass

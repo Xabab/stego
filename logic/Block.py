@@ -16,7 +16,7 @@
 from PIL import Image
 from logic.Stego import Stego
 
-class Block(Stego):
+class Block(Stego):  # basically LSB with intervals
 
     def __init__(self):
         super().__init__()

@@ -21,7 +21,7 @@ import numpy as np
 import pprint
 from PIL import Image, ImageChops
 
-from logic import KochJao, BenhgamMemonEoYoung
+from logic import KochZhao, BenhamMemonYeoYeung
 from logic.Quant import Quant
 from logic.Block import Block
 from logic.Cross import Cross
@@ -153,7 +153,7 @@ Donec gravida eget sapien et tincidunt. Pellentesque non bibendum dui. Quisque n
     print(message)
     print()
 
-    kj = BenhgamMemonEoYoung.BenhgamMemonEoYoung()
+    kj = BenhamMemonYeoYeung.BenhamMemonYeoYeung()
     kj.importImage('l.bmp')
     kj.dctEnergy = 25
     kj.seed = 1

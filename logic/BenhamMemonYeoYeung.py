@@ -21,10 +21,10 @@ from warnings import warn
 import numpy as np
 from PIL import Image
 
-from logic.KochJao import KochJao
+from logic.KochZhao import KochZhao
 
 
-class BenhgamMemonEoYoung(KochJao):
+class BenhamMemonYeoYeung(KochZhao):
     def __init__(self):
         super().__init__()
         self.pDctHighLimit = None

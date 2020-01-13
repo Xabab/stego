@@ -72,7 +72,7 @@ def applyInverseDct(matrix):
 
 
 
-class KochJao(Stego):
+class KochZhao(Stego):
     def __init__(self):
         super().__init__()
         self.dctEnergy = None
