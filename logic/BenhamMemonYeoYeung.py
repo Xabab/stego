@@ -31,6 +31,8 @@ class BenhamMemonYeoYeung(Stego):
     def __init__(self):
         super().__init__()
         self.window = None
+        self.dctEnergy = None
+        self.seed = None
         self.pDctHighLimit = None
         self.pDctLowWindow = None
         self.pDctLowCountLimit = None
