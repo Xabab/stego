@@ -16,7 +16,8 @@
 from abc import ABC, abstractmethod
 from PIL import Image
 
-from typing import List
+from typing import List, Callable
+
 
 class Stego(ABC):
     def __init__(self) -> None: # todo change signature for using kwargs
@@ -28,9 +29,12 @@ class Stego(ABC):
     def importImage(self, path: str):
         self._image = Image.open(path).convert("RGB")
 
-    def setMessage(self, message: str) -> None:
+    def setMessage(self, message: str, encoder: Callable[[str, str], List[int]] = None) -> None:
+        if encoder is None:
+            encoder = self.encodePayload
+
         self.message = message
-        self._payload = self.encodePayload(message, self._eof)
+        self._payload = encoder(message, self._eof)
 
     @staticmethod
     def encodePayload(string: str, eof: str = "") -> List[int]:
