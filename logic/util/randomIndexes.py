@@ -28,3 +28,17 @@ def rollSecondDiagonalIndex(window: int, ij: List[Tuple[int, int]] = None, matri
         return rollSecondDiagonalIndex(window, ij, matrixSideSize)
 
     return newIj
+
+def rollLowFreqIndex(window: int, ij: List[Tuple[int, int]] = None, matrixSideSize: int = 8) -> Tuple[int, int]:
+    if ij is None:
+        ij = []
+
+    i = random.randint(matrixSideSize - window - 1)
+    j = random.randint(matrixSideSize - window - 1)
+
+    newIj = (i, j)
+
+    if newIj[1] < 0 or newIj[1] >= 8 or newIj in ij:
+        return rollLowFreqIndex(window, ij, matrixSideSize)
+
+    return newIj
