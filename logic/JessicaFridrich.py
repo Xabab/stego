@@ -12,17 +12,45 @@
 #
 #      You should have received a copy of the GNU General Public License
 #      along with this program.  If not, see <https://www.gnu.org/licenses/>.
+from typing import List
+
 from PIL import Image
 
 from logic.KochZhao import KochZhao
 from logic.Stego import Stego
 from logic.util.dctEssentials import *
+import numpy as np
 
 class JessicaFridrich(Stego):
     def __init__(self):
         super().__init__()
 
         self.alpha = None
+
+    def _getZeroExpectedValueImageSignal(self, matrix: np.ndarray) -> np.ndarray:  # G
+        expectedValue = matrix.mean()
+        standardDeviation = np.std(matrix)
+
+        x, y = matrix.shape
+
+        return (1024 / np.sqrt(x * y)) * ((matrix - expectedValue) / standardDeviation)
+
+    def _thetaNext(self, alpha: float, thetaPrevious: float) -> float:  # T i+1
+        return ((1 + alpha) / (1 - alpha)) * thetaPrevious
+
+
+    def _indexFunction(self, x: int, thetaList: List) -> int:  # ind(x)
+        if len(thetaList) == 0: thetaList.append(1)
+
+        try:
+            return (-1) ** (next(idx for idx, value in enumerate(thetaList) if value > abs(x)))
+        except StopIteration:
+            while thetaList[-1:][0] < abs(x):
+                thetaList.append(self._thetaNext(self.alpha, thetaList[-1:][0]))
+                print(thetaList)
+
+            return (-1) ** (len(thetaList) - 1)
+
 
     def generateStegoImage(self) -> Image:
         pass
