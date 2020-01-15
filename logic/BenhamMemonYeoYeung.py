@@ -24,7 +24,7 @@ from PIL import Image
 from logic.KochZhao import KochZhao
 from logic.Stego import Stego
 from logic.util.dctEssentials import *
-from logic.util.rollDiagonalIndex import rollDiagonalIndex
+from logic.util.randomIndexes import rollSecondDiagonalIndex
 
 
 class BenhamMemonYeoYeung(Stego):
@@ -59,9 +59,9 @@ class BenhamMemonYeoYeung(Stego):
                 except IndexError:
                     continue
 
-                ij1 = rollDiagonalIndex(self.window)
-                ij2 = rollDiagonalIndex(self.window, [ij1])
-                ij3 = rollDiagonalIndex(self.window, [ij1, ij2])
+                ij1 = rollSecondDiagonalIndex(self.window)
+                ij2 = rollSecondDiagonalIndex(self.window, [ij1])
+                ij3 = rollSecondDiagonalIndex(self.window, [ij1, ij2])
 
 
                 tiles[n][m] = self.embedBitToTile(tiles[n][m], self._payload[i], ij1, ij2, ij3)
@@ -165,9 +165,9 @@ class BenhamMemonYeoYeung(Stego):
                 if not self.tileIsAcceptable(tiles[n][m]):
                     continue
 
-                ij1 = rollDiagonalIndex(self.window)
-                ij2 = rollDiagonalIndex(self.window, [ij1])
-                ij3 = rollDiagonalIndex(self.window, [ij1, ij2])
+                ij1 = rollSecondDiagonalIndex(self.window)
+                ij2 = rollSecondDiagonalIndex(self.window, [ij1])
+                ij3 = rollSecondDiagonalIndex(self.window, [ij1, ij2])
 
                 payload.append(self.extractBitFromTile(tiles[n][m], ij1, ij2, ij3))
 

@@ -25,7 +25,7 @@ from scipy.fft import dct, idct
 
 from logic.Stego import Stego
 from logic.util.dctEssentials import *
-from logic.util.rollDiagonalIndex import *
+from logic.util.randomIndexes import *
 
 
 class KochZhao(Stego):
@@ -50,8 +50,8 @@ class KochZhao(Stego):
 
         for n in range(0, len(tiles)):
             for m in range(0, len(tiles[0])):
-                ij1 = rollDiagonalIndex(self.window)
-                ij2 = rollDiagonalIndex(self.window, [ij1])
+                ij1 = rollSecondDiagonalIndex(self.window)
+                ij2 = rollSecondDiagonalIndex(self.window, [ij1])
 
                 # f.write(str((ij1, ij2)) + "\n")
 
@@ -135,8 +135,8 @@ class KochZhao(Stego):
 
         for n in range(0, len(tiles)):
             for m in range(0, len(tiles[0])):
-                ij1 = rollDiagonalIndex(self.window)
-                ij2 = rollDiagonalIndex(self.window, [ij1])
+                ij1 = rollSecondDiagonalIndex(self.window)
+                ij2 = rollSecondDiagonalIndex(self.window, [ij1])
 
                 # f.write(str((ij1, ij2)) + "\n")
 
