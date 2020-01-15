@@ -12,11 +12,13 @@
 #
 #      You should have received a copy of the GNU General Public License
 #      along with this program.  If not, see <https://www.gnu.org/licenses/>.
+from PIL import Image
 
 from logic.KochZhao import KochZhao
+from logic.Stego import Stego
 from logic.util.dctEssentials import *
 
-class JessicaFridrich(KochZhao):
+class JessicaFridrich(Stego):
     def __init__(self):
         super().__init__()
 
