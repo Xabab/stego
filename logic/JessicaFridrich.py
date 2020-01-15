@@ -12,6 +12,7 @@
 #
 #      You should have received a copy of the GNU General Public License
 #      along with this program.  If not, see <https://www.gnu.org/licenses/>.
+import random
 from typing import List
 
 from PIL import Image
@@ -26,6 +27,9 @@ class JessicaFridrich(Stego):
         super().__init__()
 
         self.alpha = None
+        self.window = None
+        self.embedCount = None
+        self.seed = None
 
     def _getZeroExpectedValueImageSignal(self, matrix: np.ndarray) -> np.ndarray:  # G
         expectedValue = matrix.mean()
@@ -53,7 +57,15 @@ class JessicaFridrich(Stego):
 
 
     def generateStegoImage(self) -> Image:
-        pass
+        r, g, b = self._image.split()
+
+        tiles = devideToTiles(np.array(b), 8)
+
+        random.seed(self.seed)
+
+        for n in range(0, len(tiles)):
+            for m in range(0, len(tiles[0])):
+                raise NotImplementedError
 
     def extractStegoMessage(self) -> str:
         pass
