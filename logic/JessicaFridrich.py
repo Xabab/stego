@@ -22,4 +22,17 @@ class JessicaFridrich(Stego):
     def __init__(self):
         super().__init__()
 
-        raise NotImplementedError
+        self.alpha = None
+
+    def generateStegoImage(self) -> Image:
+        pass
+
+    def extractStegoMessage(self) -> str:
+        pass
+
+    def getContainerVolume(self) -> int:
+        return (self._image.size[0] // 8) * (self._image.size[1] // 8)
+
+
+
+
