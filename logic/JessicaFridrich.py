@@ -32,7 +32,6 @@ class JessicaFridrich(Stego):
 
         self.alpha = None
         self.window = None
-        # self.embedCount = None
         self.seed = None
 
     def _getZeroExpectedValueImageSignal(self, matrix: np.ndarray) -> np.ndarray:  # G

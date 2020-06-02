@@ -21,7 +21,7 @@ import numpy as np
 import pprint
 from PIL import Image, ImageChops
 
-from logic import KochZhao, BenhamMemonYeoYeung
+from logic import KochZhao, BenhamMemonYeoYeung, JessicaFridrich
 from logic.Quant import Quant
 from logic.Block import Block
 from logic.Cross import Cross
@@ -46,13 +46,7 @@ def difference(image1: Image, image2: Image) -> Image:
 
 def imageGenerateDemo() -> None:
     message = """   Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis sollicitudin augue ut augue pretium, a lacinia lacus posuere. 
-Mauris vel mauris lorem. Etiam varius tempus diam in sodales. Morbi ultricies nisi eu commodo dictum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi tempus tempus malesuada. 
-Donec gravida eget sapien et tincidunt. Pellentesque non bibendum dui. Quisque non sem sit amet tortor aliquam mollis ac in eros. 
-Sed molestie consectetur porta. Mauris egestas lacus libero, nec euismod erat molestie sed. Maecenas feugiat gravida turpis non sodales. Mauris at consectetur leo. 
-Mauris aliquet feugiat ligula a cursus. Duis in nibh justo. Quisque eleifend imperdiet sapien, vitae lobortis lectus ultricies eu. 
-Nullam non iaculis lacus. Vestibulum quis justo enim. Phasellus tristique tortor quis dui viverra mattis. Nunc gravida iaculis lorem, a tempus nisl accumsan in. 
-Morbi ullamcorper egestas leo, in egestas magna tempus sed. Donec vitae urna a nisi blandit porttitor vel dignissim massa. 
-Phasellus finibus risus quis nibh ultricies imperdiet. Proin tempor ex at sagittis elementum. Suspendisse potenti."""
+Mauris vel mauris lorem. Etiam varius tempus diam in sodales. Morbi ultricies nisi eu commodo dictum. Lorem ipsum dolor sit amet."""
     print("Initial message:\n")
     print(message)
     print()
@@ -153,21 +147,64 @@ Donec gravida eget sapien et tincidunt. Pellentesque non bibendum dui. Quisque n
     print(message)
     print()
 
-    kj = BenhamMemonYeoYeung.BenhamMemonYeoYeung()
+    kj = KochZhao.KochZhao()
     kj.importImage('l.bmp')
-    kj.dctEnergy = 25
+    kj.dctEnergy = 50
     kj.seed = 1
-    kj.window = 0
-    kj.pDctLowWindow = 1
-    kj.pDctLowCountLimit = 40
-    kj.pDctHighLimit = 1500
+    kj.window = 3
     kj.setMessage(message)
-    kj.generateStegoImage().save("./out/BenhgamMemonEoYoung.bmp")
+    kj.generateStegoImage().save("./out/KochZhao.bmp")
 
-    kj.importImage("./out/BenhgamMemonEoYoung.bmp")
-    print("Retrieved message from 'BenhgamMemonEoYoung.bmp':\n")
+    kj.importImage("./out/KochZhao.bmp")
+    print("Retrieved message from 'KochZhao.bmp':\n")
     print(kj.extractStegoMessage())
+    print()
+
+    difference(Image.open("./l.bmp"), Image.open("./out/KochZhao.bmp")).save("./out/diff KochZhao.png")
+
+    crop = Image.open("./out/KochZhao.bmp")
+    crop = crop.crop((0, 0, 16, 16))
+    crop = crop.resize((516, 516), Image.NEAREST)
+    crop.save("./out/crop KochZhao.bmp")
+
+
+
+    bmyy = BenhamMemonYeoYeung.BenhamMemonYeoYeung()
+    bmyy.importImage('l.bmp')
+    bmyy.dctEnergy = 25
+    bmyy.seed = 1
+    bmyy.window = 0
+    bmyy.pDctLowWindow = 1
+    bmyy.pDctLowCountLimit = 40
+    bmyy.pDctHighLimit = 1500
+    bmyy.setMessage(message)
+    bmyy.generateStegoImage().save("./out/BenhgamMemonEoYoung.bmp")
+
+    bmyy.importImage("./out/BenhgamMemonEoYoung.bmp")
+    print("Retrieved message from 'BenhgamMemonEoYoung.bmp':\n")
+    print(bmyy.extractStegoMessage())
     print()
 
     difference(Image.open("./l.bmp"), Image.open("./out/BenhgamMemonEoYoung.bmp")).save("./out/diff BenhgamMemonEoYoung.png")
 
+    crop = Image.open("./out/BenhgamMemonEoYoung.bmp")
+    crop = crop.crop((0, 0, 16, 16))
+    crop = crop.resize((516, 516), Image.NEAREST)
+    crop.save("./out/crop BenhgamMemonEoYoung.bmp")
+
+    '''
+    jf = JessicaFridrich.JessicaFridrich()
+    jf.importImage('l.bmp')
+    jf.alpha = 0.25
+    jf.seed = 1
+    jf.window = 0
+    jf.setMessage(message)
+    jf.generateStegoImage().save("./out/JessicaFridrich.bmp")
+
+    jf.importImage("./out/JessicaFridrich.bmp")
+    print("Retrieved message from 'JessicaFridrich.bmp':\n")
+    print(bmyy.extractStegoMessage())
+    print()
+
+    # difference(Image.open("./l.bmp"), Image.open("./out/JessicaFridrich.bmp")).save("./out/diff JessicaFridrich.png")
+    '''

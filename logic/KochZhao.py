@@ -21,7 +21,6 @@ from typing import Tuple, List
 
 import numpy as np
 from PIL import Image
-from scipy.fft import dct, idct
 
 from logic.Stego import Stego
 from logic.util.dctEssentials import *
